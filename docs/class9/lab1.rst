@@ -1,8 +1,8 @@
 Module 1: AI-Generated Vulnerable App
 ======================================
 
-This module introduces participants to AI-assisted coding using the Cline Extension in Visual Studio
-Code. Participants will generate a vulnerable application using pre-canned prompts and observe both
+This module introduces you to AI-assisted coding using the Cline Extension in Visual Studio
+Code. You will generate a vulnerable application using pre-canned prompts and observe both
 the benefits and security risks of AI-generated code.
 
 The goal of this module is to:

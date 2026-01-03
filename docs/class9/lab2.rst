@@ -1,427 +1,381 @@
-Lab 2: Leveraging Terraform
-===========================
+Module 2: Deploy and Secure Vulnerable App
+==========================================
 
-The following lab tasks will guide you through using Terraform to deploy and secure a Web based application.  
-Students will start by creating an authentication certificate within Distributed Cloud. Terraform will be 
-configured to utilize the certificate for authenticating the API calls.  Next, a **tfvars** file is created to 
-customize the deployment to match the student's environment. Terraform will then be used to deploy an HTTP 
-Health Check, Origin Pool, and HTTP Load Balancer. Students will then modify and apply the Terraform 
-configuration to add a Web Application Firewall to their existing HTTP Load Balancer. 
+This module guides you through deploying a pre-established vulnerable application using GitLab CI/CD
+pipelines and securing it with F5 Distributed Cloud (F5 XC) services. You will experience the complete
+DevSecOps workflow from code commit to production deployment with integrated security controls.
 
-**Expected Lab Time: 20 minutes**
+In this module, you will:
 
-Task 1: Deploy a Web Application with Terraform  
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In this task, you will create an API Certificate for Terraform to authenticate to the Distributed Cloud API.  
-Next, you will create a **tfvars** file to specify environment variables unique to your environment.  After the 
-**tfvars** file is created, you will **intialize** Terraform environment.  You use the **initialize** command to
-setup the local Terraform environment and download the correct version of any required modules.  After the 
-environment is initialized, the **plan** command is used to perform a dry run of the terraform configuration.
-Planning does not create any objects.  Planning allows you to verify your syntax.  The last step is to use 
-**apply** to actually create an HTTP Health Check, Origin Pool, and HTTP Load Balancer. 
+* Commit a pre-established vulnerable application to GitLab
+* Experience automated SAST and Secret Detection in CI/CD pipelines
+* Deploy the application to F5XC vK8s using Terraform
+* Configure WAF, Bot Defense, and API Protection
+* Trigger attack scripts to test security controls
+
+**Expected Lab Time: 45-50 minutes**
+
+Task 1: Commit Pre-Established Vulnerable Application Code
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following steps will allow you to commit the pre-created vulnerable application to GitLab CE,
+triggering the automated CI/CD pipeline that builds, scans, and deploys the application.
 
 +---------------------------------------------------------------------------------------------------------------+
-| **Clone the appworld-f5xc-automation repo**                                                                   |
+| **Open Pre-Created Vulnerable Application**                                                                   |
 +===============================================================================================================+
-| 1. In your UDF deployment, click on the **VS CODE** Access method under the **Client** system. This will      |
+| 1. In VSCode Server, navigate to the project directory containing the pre-created vulnerable application.     |
 |                                                                                                               |
-|    launch a tab in your web browser.                                                                          |      
-+---------------------------------------------------------------------------------------------------------------+
-| 2. From the VS Code Menu bar select **Terminal** and then **New Terminal**.                                   |
+|    Use the File Explorer in the sidebar to browse to the project folder.                                      |
 |                                                                                                               |
-| |lab2-Clone_Terminal|                                                                                         |
+| |module2-project_directory|                                                                                   |
 +---------------------------------------------------------------------------------------------------------------+
-| 3. In the resulting terminal window at the bottom of VSCode enter                                             |
+| 2. Explore the application structure and review the key files. The application should contain the following   |
+|                                                                                                               |
+|    structure:                                                                                                 |
+|                                                                                                               |
+|    * **src/** - Application source code                                                                       |
+|    * **Dockerfile** - Container build configuration                                                           |
+|    * **requirements.txt** - Python dependencies                                                               |
+|    * **.gitlab-ci.yml** - CI/CD pipeline configuration                                                        |
+|    * **terraform/** - Infrastructure as Code for F5XC deployment                                              |
+|                                                                                                               |
+| |module2-file_structure|                                                                                      |
++---------------------------------------------------------------------------------------------------------------+
+| 3. Open and review the main application files to understand the code structure. Click on **app.py** or the    |
+|                                                                                                               |
+|    main application file to view its contents.                                                                |
+|                                                                                                               |
+| |module2-review_code|                                                                                         |
++---------------------------------------------------------------------------------------------------------------+
+
++---------------------------------------------------------------------------------------------------------------+
+| **Commit and Push to GitLab**                                                                                 |
++===============================================================================================================+
+| 1. Open the **Source Control** panel in VSCode by clicking the branch icon in the sidebar, or use the         |
+|                                                                                                               |
+|    integrated terminal.                                                                                       |
+|                                                                                                               |
+| |module2-source_control|                                                                                      |
++---------------------------------------------------------------------------------------------------------------+
+| 2. Stage all changes by clicking the **+** icon next to **Changes** or by running the following command in    |
+|                                                                                                               |
+|    the terminal:                                                                                              |
 |                                                                                                               |
 | .. code-block:: bash                                                                                          |
 |                                                                                                               |
-|    git clone https://github.com/f5devcentral/appworld-f5xc-automation                                         |
+|    git add .                                                                                                  |
 |                                                                                                               |
-| |lab2-Clone_Repo|                                                                                             |
+| |module2-git_add|                                                                                             |
++---------------------------------------------------------------------------------------------------------------+
+| 3. Enter a commit message describing your changes in the **Message** field:                                   |
+|                                                                                                               |
+|    *Initial commit: Pre-established vulnerable application for lab*                                           |
+|                                                                                                               |
+| |module2-commit_message|                                                                                      |
++---------------------------------------------------------------------------------------------------------------+
+| 4. Commit the changes by clicking the **Commit** button or running:                                           |
+|                                                                                                               |
+| .. code-block:: bash                                                                                          |
+|                                                                                                               |
+|    git commit -m "Initial commit: Pre-established vulnerable application for lab"                             |
+|                                                                                                               |
+| |module2-git_commit|                                                                                          |
++---------------------------------------------------------------------------------------------------------------+
+| 5. Push the changes to GitLab CE by clicking **Sync Changes** or running:                                     |
+|                                                                                                               |
+| .. code-block:: bash                                                                                          |
+|                                                                                                               |
+|    git push origin main                                                                                       |
+|                                                                                                               |
+| |module2-git_push|                                                                                            |
 +---------------------------------------------------------------------------------------------------------------+
 
 +---------------------------------------------------------------------------------------------------------------+
-| **Create API Certificate from the Distributed Cloud Console**                                                 |
+| **Observe CI/CD Pipeline Execution**                                                                          |
 +===============================================================================================================+
-| 1. If you don't still have the Distributed Cloud Console open in a browser, access the Console at:            |
+| 1. Open GitLab CE in your browser and navigate to your project. Use the URL provided in your lab environment. |
 |                                                                                                               |
-|    Console <https://https://f5-xc-lab-app.console.ves.volterra.io/>                                           |
+| |module2-gitlab_project|                                                                                      |
 +---------------------------------------------------------------------------------------------------------------+
-| 2. In the top right corner of the Distributed Cloud Console, click the **User Icon** dropdown and select      |
+| 2. Navigate to **CI/CD > Pipelines** in the left sidebar to view the triggered pipeline.                      |
 |                                                                                                               |
-|    **Account Settings**.                                                                                      |
-|                                                                                                               |
-| |lab1-Account_Settings|                                                                                       |
+| |module2-pipeline_view|                                                                                       |
 +---------------------------------------------------------------------------------------------------------------+
-| 3. In the resulting screen click **Credentials** under the **Personal Management** Heading on the left.       |
+| 3. Observe the pipeline stages executing. The pipeline includes the following stages:                         |
 |                                                                                                               |
-| |lab1-Credentials|                                                                                            |
-+---------------------------------------------------------------------------------------------------------------+
-| 4. Click **Add Credentials**.                                                                                 |
+|    * **SAST** - Static Application Security Testing                                                           |
+|    * **Secret Detection** - Scan for exposed secrets and credentials                                          |
+|    * **Build** - Source-to-container build (Image v1.0)                                                       |
+|    * **Push** - Push container image to registry                                                              |
+|    * **Deploy** - Terraform deployment to F5XC vK8s                                                           |
 |                                                                                                               |
-| |lab1-Add_Credentials|                                                                                        |
-+---------------------------------------------------------------------------------------------------------------+
-| 5. Fill in the resulting form with the following values:                                                      |
-|                                                                                                               |
-|    * **Credential Name ID:**  *<namespace>-api-cert*                                                          |
-|    * **Credential Type: Select:** *API Certificate*                                                           |
-|    * **Password:** *<some_password>*                                                                          |
-|    * **Confirm Password:** *<some_password>*                                                                  |
-|    * **Expiry Date: Select:** *<date two days in the future of today's date>*                                 |
-|                                                                                                               |
-| 6. Click **Download**.                                                                                        |
-|                                                                                                               |
-| |lab2-Terraform_Download_API_Cert|                                                                            |
+| |module2-pipeline_stages|                                                                                     |
 |                                                                                                               |
 | .. note::                                                                                                     |
-|    *Use a password that you will remember for the certificate, if you don't remember your API cert password,* |
-|    *you will need to generate a new API cert.*                                                                |
+|    *The pipeline may take several minutes to complete all stages. Wait for all stages to finish before*       |
+|    *proceeding to the next step.*                                                                             |
++---------------------------------------------------------------------------------------------------------------+
+| 4. **Alternative Flow - Secret Detection Failure:** If the pipeline fails due to exposed secrets in the       |
+|                                                                                                               |
+|    application code, you will need to correct the issue.                                                      |
+|                                                                                                               |
+|    a. Review the pipeline error in GitLab by clicking on the failed job                                       |
+|    b. Return to VSCode and correct the exposed secret in the code                                             |
+|    c. Commit and push the fix using the same steps above                                                      |
+|    d. The pipeline will re-trigger automatically                                                              |
+|                                                                                                               |
+| |module2-secret_failure|                                                                                      |
 +---------------------------------------------------------------------------------------------------------------+
 
 +---------------------------------------------------------------------------------------------------------------+
-| **Configure Terraform to Authenticate to Distributed Cloud**                                                  |
+| **Verify Automated Deployment**                                                                               |
 +===============================================================================================================+
-| 1. Go back to the VS Code server in your browser and expand the **appworld-f5xc-automation** folder and then  |
+| 1. Once the pipeline succeeds, verify that the **Container Image v1.0** has been pushed to the container      |
 |                                                                                                               |
-|    expand the **Terraform** folder.                                                                           |
+|    registry. Navigate to **Packages & Registries > Container Registry** in GitLab.                            |
 |                                                                                                               |
-| |lab2-Terraform_Auth_Folders|                                                                                 |
+| |module2-container_registry|                                                                                  |
 +---------------------------------------------------------------------------------------------------------------+
-| 2. Right click the **Terraform** folder and select new folder.  Type **credentials** in to name the folder.   |
+| 2. Log in to the F5XC Console and navigate to **Distributed Apps > Virtual K8s** to verify the **vK8s         |
 |                                                                                                               |
-| |lab2-Terraform_Auth_Folders_New|                                                                             |
+|    Workload** has been deployed.                                                                              |
+|                                                                                                               |
+| |module2-vk8s_workload|                                                                                       |
 +---------------------------------------------------------------------------------------------------------------+
-| 3. Copy the certificate you downloaded by dragging it to the **credentials** folder you just created.         |
+| 3. Navigate to **Multi-Cloud App Connect > Manage > Load Balancers > Origin Pools** to verify the **Origin    |
+|                                                                                                               |
+|    Pool** has been created and is pointing to the vK8s workload.                                              |
+|                                                                                                               |
+| |module2-origin_pool|                                                                                         |
 +---------------------------------------------------------------------------------------------------------------+
-| 4. Right click the certificate in VSCode and select **Rename**.  Change the name of the file to               |
+| 4. Navigate to **Multi-Cloud App Connect > Manage > Load Balancers > HTTP Load Balancers** to verify the      |
 |                                                                                                               |
-|    **xc-api-cert.p12**                                                                                        |
+|    **HTTP Load Balancer** has been configured with the following security controls:                           |
 |                                                                                                               |
-| |lab2-Terraform_Auth_Folders_Cert|                                                                            |
+|    * WAF policy attached                                                                                      |
+|    * Bot Defense enabled                                                                                      |
+|    * API Protection enabled                                                                                   |
+|                                                                                                               |
+| |module2-http_lb|                                                                                             |
 +---------------------------------------------------------------------------------------------------------------+
-| 5. Set an environment variable for the API certificate password by running the following command in the       |
+| 5. Note the public URL of your deployed application from the HTTP Load Balancer configuration. You will need  |
 |                                                                                                               |
-|    VSCode terminal window:                                                                                    |
+|    this URL for the next task.                                                                                |
+|                                                                                                               |
+| |module2-f5xc_verification|                                                                                   |
++---------------------------------------------------------------------------------------------------------------+
+
+Task 2: Trigger Simple Attack Script
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following steps will allow you to execute attack scripts against the deployed vulnerable
+application to test the effectiveness of the F5XC security controls.
+
++---------------------------------------------------------------------------------------------------------------+
+| **Identify Application URL and Verify Access**                                                                |
++===============================================================================================================+
+| 1. Retrieve the public URL of your deployed application from the HTTP Load Balancer configuration noted in    |
+|                                                                                                               |
+|    the previous task.                                                                                         |
+|                                                                                                               |
+| |module2-app_url|                                                                                             |
++---------------------------------------------------------------------------------------------------------------+
+| 2. Open the application URL in your browser to verify the application is accessible and functioning.          |
+|                                                                                                               |
+| |module2-app_accessible|                                                                                      |
++---------------------------------------------------------------------------------------------------------------+
+
++---------------------------------------------------------------------------------------------------------------+
+| **Execute Attack Scripts**                                                                                    |
++===============================================================================================================+
+| 1. Open a terminal in VSCode Server by selecting **Terminal > New Terminal** from the menu, or access the     |
+|                                                                                                               |
+|    client VM terminal.                                                                                        |
+|                                                                                                               |
+| |module2-terminal|                                                                                            |
++---------------------------------------------------------------------------------------------------------------+
+| 2. Navigate to the attack scripts directory provided in your lab environment:                                 |
 |                                                                                                               |
 | .. code-block:: bash                                                                                          |
 |                                                                                                               |
-|    export VES_P12_PASSWORD="<some_password>"                                                                  |
+|    cd /path/to/attack-scripts                                                                                 |
 |                                                                                                               |
-| |lab2-Terraform_Auth_Env|                                                                                     |
+| |module2-attack_scripts_dir|                                                                                  |
++---------------------------------------------------------------------------------------------------------------+
+| 3. Review the available attack scripts by listing the directory contents:                                     |
+|                                                                                                               |
+| .. code-block:: bash                                                                                          |
+|                                                                                                               |
+|    ls -la                                                                                                     |
+|                                                                                                               |
+| |module2-attack_scripts|                                                                                      |
++---------------------------------------------------------------------------------------------------------------+
+| 4. Execute the **SQL Injection** attack script against your application:                                      |
+|                                                                                                               |
+| .. code-block:: bash                                                                                          |
+|                                                                                                               |
+|    ./sqli_attack.sh <YOUR_APP_URL>                                                                            |
+|                                                                                                               |
+| |module2-sqli_attack|                                                                                         |
 |                                                                                                               |
 | .. note::                                                                                                     |
-|    *Replace <some_password> with the password you entered when creating the API certificate.  You need to*    |
-|    *wrap the password in "".  If your password is password, enter: export VES_P12_PASSWORD="password"*        |
+|    *Replace <YOUR_APP_URL> with the actual URL of your deployed application.*                                 |
++---------------------------------------------------------------------------------------------------------------+
+| 5. Execute the **Cross-Site Scripting (XSS)** attack script:                                                  |
+|                                                                                                               |
+| .. code-block:: bash                                                                                          |
+|                                                                                                               |
+|    ./xss_attack.sh <YOUR_APP_URL>                                                                             |
+|                                                                                                               |
+| |module2-xss_attack|                                                                                          |
++---------------------------------------------------------------------------------------------------------------+
+| 6. Execute additional attack scripts as provided by your instructor:                                          |
+|                                                                                                               |
+| .. code-block:: bash                                                                                          |
+|                                                                                                               |
+|    ./bot_attack.sh <YOUR_APP_URL>                                                                             |
+|    ./api_abuse.sh <YOUR_APP_URL>                                                                              |
+|                                                                                                               |
+| |module2-additional_attacks|                                                                                  |
 +---------------------------------------------------------------------------------------------------------------+
 
 +---------------------------------------------------------------------------------------------------------------+
-| **Create a tfvars File for Specifying Environment Specific Variables**                                        |
+| **Review Attack Results in F5XC Console**                                                                     |
 +===============================================================================================================+
-| 1. From the **EXPLORER** panel, right click the **Terraform** folder, and then select new file. Enter the     |
+| 1. Log in to the F5XC Console and navigate to **Web App & API Protection** from the home dashboard.           |
 |                                                                                                               |
-|    name **terraform.tfvars** for the new file that is created and press enter.                                | 
-|                                                                                                               |
-| |lab2-Terraform_Tfvars|                                                                                       |
+| |module2-waap_dashboard|                                                                                      |
 +---------------------------------------------------------------------------------------------------------------+
-| 2. This will open the **terraform.tfvars** file in the right panel of Visual Studio Code, enter the following |
+| 2. Navigate to **Dashboards > Security Dashboard** to view an overview of detected attacks and security       |
 |                                                                                                               |
-|    values into the file:                                                                                      |
+|    events.                                                                                                    |
 |                                                                                                               |
-| .. code-block:: bash                                                                                          |
+| |module2-security_analytics|                                                                                  |
++---------------------------------------------------------------------------------------------------------------+
+| 3. Review the **Security Events** log by navigating to **Apps & APIs > Security > Security Analytics**. You   |
 |                                                                                                               |
-|    api_p12     = "./credentials/xc-api-cert.p12"                                                              |
-|    tenant_name = "f5-xc-lab-app"                                                                              |
-|    namespace   = "<namespace>"                                                                                |
+|    should see events corresponding to your attack scripts:                                                    |
 |                                                                                                               |
-| |lab2-Terraform_Tfvars_Values|                                                                                |
+|    * **SQL Injection** - WAF Signature Match - Blocked                                                        |
+|    * **XSS** - WAF Signature Match - Blocked                                                                  |
+|    * **Bot Traffic** - Bot Defense - Flagged/Blocked                                                          |
+|    * **API Abuse** - API Protection - Rate Limited/Blocked                                                    |
 |                                                                                                               |
-| .. note::                                                                                                     |
-|    *Replace <namespace> with your assigned namespace. You need to wrap the namespace in "". If your assigned* |     
-|    *namespace is brave-collie, enter: namespace = "brave-collie"*                                             |
+| |module2-security_events|                                                                                     |
++---------------------------------------------------------------------------------------------------------------+
+| 4. Click on an individual security event to drill down and view detailed information:                         |
+|                                                                                                               |
+|    * Attack signature matched                                                                                 |
+|    * Request details (headers, payload)                                                                       |
+|    * Action taken (blocked, flagged, allowed)                                                                 |
+|    * Source IP and geo-location                                                                               |
+|                                                                                                               |
+| |module2-event_details|                                                                                       |
++---------------------------------------------------------------------------------------------------------------+
+| 5. Navigate to **Apps & APIs > Security > WAF** to review the WAF Dashboard showing an overview of blocked    |
+|                                                                                                               |
+|    attacks.                                                                                                   |
+|                                                                                                               |
+| |module2-waf_dashboard|                                                                                       |
 +---------------------------------------------------------------------------------------------------------------+
 
 +---------------------------------------------------------------------------------------------------------------+
-| **Initialize, Plan, and Apply Your Terraform Code**                                                           |
+| **Analyze Bot Defense Signals**                                                                               |
 +===============================================================================================================+
-| 1. In the Terminal at the bottom of Visual Studio Code, change directory into the Terraform folder.:          |
+| 1. Navigate to **Apps & APIs > Security > Bot Defense** in the F5XC Console.                                  |
 |                                                                                                               |
-| .. code-block:: bash                                                                                          |
-|                                                                                                               |
-|    cd appworld-f5xc-automation/Terraform                                                                      |
-|                                                                                                               |
-| |lab2-Terraform_Deploy_Directory|                                                                             |
+| |module2-bot_defense|                                                                                         |
 +---------------------------------------------------------------------------------------------------------------+
-| 2. In the Terminal at the bottom of Visual Studio Code, run the following command to initialize the Terraform |
+| 2. Review the bot classification and signals displayed in the dashboard:                                      |
 |                                                                                                               |
-|    environment:                                                                                               |
+|    * Automated traffic detection                                                                              |
+|    * Bot signatures identified                                                                                |
+|    * Mitigation actions applied                                                                               |
 |                                                                                                               |
-| .. code-block:: bash                                                                                          |
-|                                                                                                               |
-|    terraform init                                                                                             |
-|                                                                                                               |
-| |lab2-Terraform_Deploy_Init|                                                                                  |
-+---------------------------------------------------------------------------------------------------------------+
-| 3. Review the Init Results. You should see a **Terraform has been successfully initialized!** message.        |
-|                                                                                                               |
-|    **DO NOT PROCEED AND ASK A LAB ASSISTANT FOR HELP IF YOU DON'T SEE THE SUCCESSFULLY INITIALIZED MESSAGE.** |
-|                                                                                                               |
-| |lab2-Terraform_Deploy_Init_Success|                                                                          |
-+---------------------------------------------------------------------------------------------------------------+
-| 4. In the Terminal, enter the following command and press Enter:                                              |
-|                                                                                                               |
-| .. code-block:: bash                                                                                          |
-|                                                                                                               |
-|    terraform plan                                                                                             |
-|                                                                                                               |
-| |lab2-Terraform_Deploy_Plan|                                                                                  |
-+---------------------------------------------------------------------------------------------------------------+
-| 5. Review the Plan results. This shows what Terraform is planning to create.                                  |
-|                                                                                                               |
-| |lab2-Terraform_Deploy_Plan_Results|                                                                          |
-+---------------------------------------------------------------------------------------------------------------+
-| 6. In the Terminal, enter the following command and press Enter:                                              |
-|                                                                                                               |
-| .. code-block:: bash                                                                                          |
-|                                                                                                               |
-|    terraform apply                                                                                            |
-|                                                                                                               |
-| |lab2-Terraform_Deploy_Apply|                                                                                 |
-+---------------------------------------------------------------------------------------------------------------+
-| 7. When prompted **Do you want to perform these actions?**, type **yes** and press Enter.                     |
-|                                                                                                               |
-| |lab2-Terraform_Deploy_Apply_Yes|                                                                             |
-+---------------------------------------------------------------------------------------------------------------+
-| 8. Review the Apply results. This shows what Terraform created.                                               |
-|                                                                                                               |
-| |lab2-Terraform_Deploy_Apply_Results|                                                                         |
+| |module2-bot_signals|                                                                                         |
 +---------------------------------------------------------------------------------------------------------------+
 
 +---------------------------------------------------------------------------------------------------------------+
-| **Verify the Appworld App is Accessible Via a Web Browser**                                                   |
+| **End of Module 2**                                                                                           |
 +===============================================================================================================+
-| 1. Open a new tab in your Chrome browser and enter the following URL                                          |
+| This concludes Module 2. In this module, you learned about the complete DevSecOps workflow from code commit   |
 |                                                                                                               |
-|    **http://<namespace>-tf.lab-app.f5demos.com**                                                              |
+| to production deployment with integrated security controls. Key takeaways:                                    |
 |                                                                                                               |
-| .. note::                                                                                                     |
-|    *This illustrates that you are able to configure the delivery of an application via the Distributed Cloud* |
-|    *API utilizing Terraform.*                                                                                 |
-+---------------------------------------------------------------------------------------------------------------+
-| |lab2-Appworld|                                                                                               |
-+---------------------------------------------------------------------------------------------------------------+
-
-Task 2: Create & Attach WAF Policy 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In this task, you will modify your Terraform configuration to create and apply an Application Firewall policy with
-the default settings. Since Terraform tracks state, the apply command is used to modify the required existing 
-objects within Distributed Cloud.
-
-+---------------------------------------------------------------------------------------------------------------+
-| **Edit Your Terraform Code to Create an Application Firewall and Add It to the Load Balancer**                |
-+===============================================================================================================+
-| 1. From the Visual Studio Code Explorer panel, click **main.tf**, to open the Terraform configuration.        |
+|    * GitLab CI/CD provides automated SAST, Secret Detection, and deployment pipelines                         |
+|    * Terraform enables Infrastructure as Code deployment of F5XC resources                                    |
+|    * F5XC WAAP provides comprehensive protection with WAF, Bot Defense, and API Protection                    |
+|    * Security visibility through real-time attack detection and comprehensive logging                         |
 |                                                                                                               |
-| |lab2-Terraform_AppFw|                                                                                        |
-+---------------------------------------------------------------------------------------------------------------+
-| 2. Scroll down to the bottom of the configuration and paste in the following lines to create the Web          |
+| Proceed to **Module 3** to add advanced security controls and API functionality.                              |
 |                                                                                                               |
-|    Application Firewall policy.                                                                               |
-|                                                                                                               |
-| .. code-block:: bash                                                                                          |
-|                                                                                                               |
-|    # Create WAF Policy                                                                                        |
-|    resource "volterra_app_firewall" "waf" {                                                                   |
-|      name = "${var.namespace}-appfw"                                                                          |
-|      namespace = var.namespace                                                                                |
-|      allow_all_response_codes = true                                                                          |
-|      default_anonymization = true                                                                             |
-|      use_default_blocking_page = true                                                                         |
-|      default_bot_setting = true                                                                               |
-|      default_detection_settings = true                                                                        |
-|      blocking = true                                                                                          |
-|    }                                                                                                          |
-|                                                                                                               |
-| |lab2-Terraform_AppFw_Create|                                                                                 |
-+---------------------------------------------------------------------------------------------------------------+
-| 3. Locate the **Create Load Balancer** configuration within **main.tf** and replace the **disable_waf = true**|
-|                                                                                                               |
-|    line with the following configuration:                                                                     |
-|                                                                                                               |
-| .. code-block:: bash                                                                                          |
-|                                                                                                               |
-|    # WAF Config                                                                                               |
-|    app_firewall {                                                                                             |
-|      name = volterra_app_firewall.waf.name                                                                    |
-|      namespace = var.namespace                                                                                |
-|    }                                                                                                          |
-|                                                                                                               |
-| |lab2-Terraform_AppFw_LB|                                                                                     |
-|                                                                                                               |
-| .. note::                                                                                                     |
-|    *The WAF Config should be indented two spaces under the Load Balancer configuration to maintain nesting*   |
-|    *style conventions.*                                                                                       |
-+---------------------------------------------------------------------------------------------------------------+
-
-+---------------------------------------------------------------------------------------------------------------+
-| **Plan and Apply Your New Terraform Code to Create an Application Firewall and Associate It to Your LB**      |
-+===============================================================================================================+
-| 1. In the Terminal, enter the following command and press Enter:                                              |
-|                                                                                                               |
-| .. code-block:: bash                                                                                          |
-|                                                                                                               |
-|    terraform plan                                                                                             |
-|                                                                                                               |
-| |lab2-Terraform_AppFw_Plan|                                                                                   |
-+---------------------------------------------------------------------------------------------------------------+
-| 2. Review the Plan results. This shows what Terraform is planning to create.                                  |
-|                                                                                                               |
-| |lab2-Terraform_AppFw_Plan_Results|                                                                           |
-+---------------------------------------------------------------------------------------------------------------+
-| 3. In the Terminal, enter the following command and press Enter:                                              |
-|                                                                                                               |
-| .. code-block:: bash                                                                                          |
-|                                                                                                               |
-|    terraform apply                                                                                            |
-|                                                                                                               |
-| |lab2-Terraform_AppFw_Apply|                                                                                  |
-+---------------------------------------------------------------------------------------------------------------+
-| 4. When prompted **Do you want to perform these actions?**, type **yes** and press Enter.                     |
-|                                                                                                               |
-| |lab2-Terraform_AppFw_Apply_Yes|                                                                              |
-+---------------------------------------------------------------------------------------------------------------+
-| 5. Review the Apply results. This shows what Terraform created.                                               |
-|                                                                                                               |
-| |lab2-Terraform_AppFw_Apply_Results|                                                                          |
-+---------------------------------------------------------------------------------------------------------------+
-
-+---------------------------------------------------------------------------------------------------------------+
-| **Verify the Application Firewall was Created and Applied Within the Distributed Cloud Console**              |
-+===============================================================================================================+
-| 1. Switch back to your Browser that is connected to the Distributed Cloud Console.                            |
-+---------------------------------------------------------------------------------------------------------------+
-| 2. If you are not already in Web App & API Protection, select **Web App & API Protection** from the **Select**|
-|                                                                                                               |
-|    **Workspace** drowpown.                                                                                    |
-|                                                                                                               |
-| |lab2-Terraform_Console_Web|                                                                                  |
-+---------------------------------------------------------------------------------------------------------------+
-| 3. In the resulting screen, expand the **Manage** menu and click **Load Balancers** and then select           |
-|                                                                                                               |
-|    **HTTP Load Balancers**.                                                                                   |
-|                                                                                                               |
-| |lab2-Terraform_Console_Manage_LBs|                                                                           |
-+---------------------------------------------------------------------------------------------------------------+
-| 4. From the HTTP Load Balancers page, locate the HTTP Load Balancer that you created via Terraform.  Click    |
-|                                                                                                               |
-|    the **ellipsis** under **Actions** and select **Manage Configuration**.                                    |
-|                                                                                                               |
-| |lab2-Terraform_Console_Manage_LB_Manage|                                                                     |
-+---------------------------------------------------------------------------------------------------------------+
-| 5. From the resulting screen, select **Web Application Firewall** under the HTTP Load Balancer frame to jump  |
-|                                                                                                               |
-|    to the **Web Application Firewall** configuration section.                                                 |
-|                                                                                                               |
-| |lab2-Terraform_Console_Manage_LB_WebAppFw|                                                                   |
-+---------------------------------------------------------------------------------------------------------------+
-| 6. Notice that the Web Application Firewall is now Enabled and the policy you created using Terraform is      |
-|                                                                                                               |
-|    applied.                                                                                                   |
-|                                                                                                               |
-| |lab2-Terraform_Console_Manage_LB_WebAppFw_Enable|                                                            |
-+---------------------------------------------------------------------------------------------------------------+
-| 7. Click **Cancel and Exit** to close out of the HTTP Load Balancer configuration.                            |
-|                                                                                                               |
-| |lab2-Terraform_Console_Manage_LB_Cancel|                                                                     |
-+---------------------------------------------------------------------------------------------------------------+
-
-+---------------------------------------------------------------------------------------------------------------+
-| **End of Lab 2**                                                                                              |
-+===============================================================================================================+
-| This concludes Lab 2. In this lab, you learned how to set up Terraform to authenticate to the F5 Distributed  |
-|                                                                                                               |
-| Cloud API with an API Certificate. You then created a **tfvars** file to customize the deployment to match    |
-|                                                                                                               |
-| your environment. After that, you used Terraform to deploy an HTTP Health Check, Origin Pool, and HTTP Load   |
-|                                                                                                               |
-| Balancer. The Terraform configuration was then modified to create a Web Application Firewall policy and apply |
-|                                                                                                               |
-| it to the HTTP Load Balancer.                                                                                 |
-+---------------------------------------------------------------------------------------------------------------+
 | |labend|                                                                                                      |
 +---------------------------------------------------------------------------------------------------------------+
 
-.. |lab2-Clone_Terminal| image:: _static/lab2-Clone_Terminal.png
+.. |module2-project_directory| image:: _static/module2-project_directory.png
    :width: 800px
-.. |lab2-Clone_Repo| image:: _static/lab2-Clone_Repo.png
+.. |module2-file_structure| image:: _static/module2-file_structure.png
    :width: 800px
-.. |lab1-Account_Settings| image:: _static/lab1-Account_Settings.png
+.. |module2-review_code| image:: _static/module2-review_code.png
    :width: 800px
-.. |lab1-Credentials| image:: _static/lab1-Credentials.png
+.. |module2-source_control| image:: _static/module2-source_control.png
    :width: 800px
-.. |lab1-Add_Credentials| image:: _static/lab1-Add_Credentials.png
+.. |module2-git_add| image:: _static/module2-git_add.png
    :width: 800px
-.. |lab2-Terraform_Download_API_Cert| image:: _static/lab2-Terraform_Download_API_Cert.png
+.. |module2-commit_message| image:: _static/module2-commit_message.png
    :width: 800px
-.. |lab2-Terraform_Auth_Folders| image:: _static/lab2-Terraform_Auth_Folders.png
+.. |module2-git_commit| image:: _static/module2-git_commit.png
    :width: 800px
-.. |lab2-Terraform_Auth_Folders_New| image:: _static/lab2-Terraform_Auth_Folders_New.png
+.. |module2-git_push| image:: _static/module2-git_push.png
    :width: 800px
-.. |lab2-Terraform_Auth_Folders_Cert| image:: _static/lab2-Terraform_Auth_Folders_Cert.png
+.. |module2-gitlab_project| image:: _static/module2-gitlab_project.png
    :width: 800px
-.. |lab2-Terraform_Auth_Env| image:: _static/lab2-Terraform_Auth_Env.png
+.. |module2-pipeline_view| image:: _static/module2-pipeline_view.png
    :width: 800px
-.. |lab2-Terraform_Tfvars| image:: _static/lab2-Terraform_Tfvars.png
+.. |module2-pipeline_stages| image:: _static/module2-pipeline_stages.png
    :width: 800px
-.. |lab2-Terraform_Tfvars_Values| image:: _static/lab2-Terraform_Tfvars_Values.png
+.. |module2-secret_failure| image:: _static/module2-secret_failure.png
    :width: 800px
-.. |lab2-Terraform_Deploy_Directory| image:: _static/lab2-Terraform_Deploy_Directory.png
+.. |module2-container_registry| image:: _static/module2-container_registry.png
    :width: 800px
-.. |lab2-Terraform_Deploy_Init| image:: _static/lab2-Terraform_Deploy_Init.png
+.. |module2-vk8s_workload| image:: _static/module2-vk8s_workload.png
    :width: 800px
-.. |lab2-Terraform_Deploy_Init_Success| image:: _static/lab2-Terraform_Deploy_Init_Success.png
+.. |module2-origin_pool| image:: _static/module2-origin_pool.png
    :width: 800px
-.. |lab2-Terraform_Deploy_Plan| image:: _static/lab2-Terraform_Deploy_Plan.png
+.. |module2-http_lb| image:: _static/module2-http_lb.png
    :width: 800px
-.. |lab2-Terraform_Deploy_Plan_Results| image:: _static/lab2-Terraform_Deploy_Plan_Results.png
+.. |module2-f5xc_verification| image:: _static/module2-f5xc_verification.png
    :width: 800px
-.. |lab2-Terraform_Deploy_Apply| image:: _static/lab2-Terraform_Deploy_Apply.png
+.. |module2-app_url| image:: _static/module2-app_url.png
    :width: 800px
-.. |lab2-Terraform_Deploy_Apply_Yes| image:: _static/lab2-Terraform_Deploy_Apply_Yes.png
+.. |module2-app_accessible| image:: _static/module2-app_accessible.png
    :width: 800px
-.. |lab2-Terraform_Deploy_Apply_Results| image:: _static/lab2-Terraform_Deploy_Apply_Results.png
+.. |module2-terminal| image:: _static/module2-terminal.png
    :width: 800px
-.. |lab2-Appworld| image:: _static/lab2-Appworld.png
+.. |module2-attack_scripts_dir| image:: _static/module2-attack_scripts_dir.png
    :width: 800px
-.. |lab2-Terraform_AppFw| image:: _static/lab2-Terraform_AppFw.png
+.. |module2-attack_scripts| image:: _static/module2-attack_scripts.png
    :width: 800px
-.. |lab2-Terraform_AppFw_Create| image:: _static/lab2-Terraform_AppFw_Create.png
+.. |module2-sqli_attack| image:: _static/module2-sqli_attack.png
    :width: 800px
-.. |lab2-Terraform_AppFw_LB| image:: _static/lab2-Terraform_AppFw_LB.png
-   :width: 800px   
-.. |lab2-Terraform_AppFw_Plan| image:: _static/lab2-Terraform_AppFw_Plan.png
+.. |module2-xss_attack| image:: _static/module2-xss_attack.png
    :width: 800px
-.. |lab2-Terraform_AppFw_Plan_Results| image:: _static/lab2-Terraform_AppFw_Plan_Results.png
+.. |module2-additional_attacks| image:: _static/module2-additional_attacks.png
    :width: 800px
-.. |lab2-Terraform_AppFw_Apply| image:: _static/lab2-Terraform_AppFw_Apply.png
+.. |module2-waap_dashboard| image:: _static/module2-waap_dashboard.png
    :width: 800px
-.. |lab2-Terraform_AppFw_Apply_Yes| image:: _static/lab2-Terraform_AppFw_Apply_Yes.png
+.. |module2-security_analytics| image:: _static/module2-security_analytics.png
    :width: 800px
-.. |lab2-Terraform_AppFw_Apply_Results| image:: _static/lab2-Terraform_AppFw_Apply_Results.png
+.. |module2-security_events| image:: _static/module2-security_events.png
    :width: 800px
-.. |lab2-Terraform_Console_Web| image:: _static/lab2-Terraform_Console_Web.png
+.. |module2-event_details| image:: _static/module2-event_details.png
    :width: 800px
-.. |lab2-Terraform_Console_Manage_LBs| image:: _static/lab2-Terraform_Console_Manage_LBs.png
+.. |module2-waf_dashboard| image:: _static/module2-waf_dashboard.png
    :width: 800px
-.. |lab2-Terraform_Console_Manage_LB_Manage| image:: _static/lab2-Terraform_Console_Manage_LB_Manage.png
+.. |module2-bot_defense| image:: _static/module2-bot_defense.png
    :width: 800px
-.. |lab2-Terraform_Console_Manage_LB_WebAppFw| image:: _static/lab2-Terraform_Console_Manage_LB_WebAppFw.png
+.. |module2-bot_signals| image:: _static/module2-bot_signals.png
    :width: 800px
-.. |lab2-Terraform_Console_Manage_LB_WebAppFw_Enable| image:: _static/lab2-Terraform_Console_Manage_LB_WebAppFw_Enable.png
-   :width: 800px
-.. |lab2-Terraform_Console_Manage_LB_Cancel| image:: _static/lab2-Terraform_Console_Manage_LB_Cancel.png
-   :width: 800px
-
-
-
 .. |labend| image:: _static/labend.png
    :width: 800px
