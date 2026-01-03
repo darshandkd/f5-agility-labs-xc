@@ -65,7 +65,7 @@ associated with "vibe coding."
 +---------------------------------------------------------------------------------------------------------------+
 | 3. Explore the Cline Extension capabilities by reviewing the available options and commands in the panel.     |
 |                                                                                                               |
-| |module1-cline_capabilities|                                                                                  |
+| |module1-cline_prompt_input|                                                                                  |
 +---------------------------------------------------------------------------------------------------------------+
 
 +---------------------------------------------------------------------------------------------------------------+
@@ -81,13 +81,13 @@ associated with "vibe coding."
 |                                                                                                               |
 |    purposes.                                                                                                  |
 |                                                                                                               |
-| |module1-cline_prompt_input|                                                                                    |
+| |module1-cline_prompt_input|                                                                                  |
 +---------------------------------------------------------------------------------------------------------------+
 | 3. Execute the prompt by pressing **Enter** or clicking the **Send** button. Observe how Cline generates      |
 |                                                                                                               |
 |    code and files automatically.                                                                              |
 |                                                                                                               |
-| |module1-cline_prompt_input|                                                                                     |
+| |module1-cline_prompt_input|                                                                                  |
 +---------------------------------------------------------------------------------------------------------------+
 | 4. Watch as the AI assistant creates multiple files and populates them with code. The file explorer will      |
 |                                                                                                               |
