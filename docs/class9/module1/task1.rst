@@ -81,7 +81,7 @@ associated with "vibe coding."
 |                                                                                                               |
 |    purposes.                                                                                                  |
 |                                                                                                               |
-| |module1-cline_prompt_input|                                                                                  |
+| |module1-files_created|                                                                                       |
 +---------------------------------------------------------------------------------------------------------------+
 | 3. Execute the prompt by pressing **Enter** or clicking the **Send** button. Observe how Cline generates      |
 |                                                                                                               |
