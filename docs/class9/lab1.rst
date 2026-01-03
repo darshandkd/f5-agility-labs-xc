@@ -28,7 +28,7 @@ associated with "vibe coding."
 +---------------------------------------------------------------------------------------------------------------+
 | **Access VSCode Server**                                                                                      |
 +===============================================================================================================+
-| 1. Open your browser and navigate to the VSCode Server URL provided in your lab environment. Verify that      |
+| 1. Open your browser and navigate to the VSCode available in your UDF lab environment. Verify that            |
 |                                                                                                               |
 |    VSCode loads successfully in your browser.                                                                 |
 |                                                                                                               |
