@@ -140,30 +140,30 @@ associated with "vibe coding."
 | |labend|                                                                                                      |
 +---------------------------------------------------------------------------------------------------------------+
 
-.. |module1-vscode_browser| image:: _static/module1-vscode_browser.png
+.. |module1-vscode_browser| image:: ../_static/module1-vscode_browser.png
    :width: 800px
-.. |module1-vscode_interface| image:: _static/module1-vscode_interface.png
+.. |module1-vscode_interface| image:: ../_static/module1-vscode_interface.png
    :width: 800px
-.. |module1-cline_sidebar| image:: _static/module1-cline_sidebar.png
+.. |module1-cline_sidebar| image:: ../_static/module1-cline_sidebar.png
    :width: 800px
-.. |module1-cline_config| image:: _static/module1-cline_config.png
+.. |module1-cline_config| image:: ../_static/module1-cline_config.png
    :width: 800px
-.. |module1-cline_capabilities| image:: _static/module1-cline_capabilities.png
+.. |module1-cline_capabilities| image:: ../_static/module1-cline_capabilities.png
    :width: 800px
-.. |module1-cline_prompt_input| image:: _static/module1-cline_prompt_input.png
+.. |module1-cline_prompt_input| image:: ../_static/module1-cline_prompt_input.png
    :width: 800px
-.. |module1-precanned_prompt| image:: _static/module1-precanned_prompt.png
+.. |module1-precanned_prompt| image:: ../_static/module1-precanned_prompt.png
    :width: 800px
-.. |module1-code_generation| image:: _static/module1-code_generation.png
+.. |module1-code_generation| image:: ../_static/module1-code_generation.png
    :width: 800px
-.. |module1-files_created| image:: _static/module1-files_created.png
+.. |module1-files_created| image:: ../_static/module1-files_created.png
    :width: 800px
-.. |module1-review_code| image:: _static/module1-review_code.png
+.. |module1-review_code| image:: ../_static/module1-review_code.png
    :width: 800px
-.. |module1-vulnerabilities| image:: _static/module1-vulnerabilities.png
+.. |module1-vulnerabilities| image:: ../_static/module1-vulnerabilities.png
    :width: 800px
-.. |module1-was_scan_results| image:: _static/module1-was_scan_results.png
+.. |module1-was_scan_results| image:: ../_static/module1-was_scan_results.png
    :width: 800px
-.. |labend| image:: _static/labend.png
+.. |labend| image:: ../_static/labend.png
    :width: 800px
 
