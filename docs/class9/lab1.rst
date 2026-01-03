@@ -26,7 +26,7 @@ configuration. You will then use AI to generate a vulnerable application to unde
 associated with "vibe coding."
 
 +---------------------------------------------------------------------------------------------------------------+
-| **Access VSCode Server**                                                                                      |
+| **Access VSCode via UDF environment**                                                                         |
 +===============================================================================================================+
 | 1. Open your browser and navigate to the VSCode available in your UDF lab environment. Verify that            |
 |                                                                                                               |
