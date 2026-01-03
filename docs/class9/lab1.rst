@@ -81,13 +81,13 @@ associated with "vibe coding."
 |                                                                                                               |
 |    purposes.                                                                                                  |
 |                                                                                                               |
-| |module1-precanned_prompt|                                                                                    |
+| |module1-cline_prompt_input|                                                                                    |
 +---------------------------------------------------------------------------------------------------------------+
 | 3. Execute the prompt by pressing **Enter** or clicking the **Send** button. Observe how Cline generates      |
 |                                                                                                               |
 |    code and files automatically.                                                                              |
 |                                                                                                               |
-| |module1-code_generation|                                                                                     |
+| |module1-cline_prompt_input|                                                                                     |
 +---------------------------------------------------------------------------------------------------------------+
 | 4. Watch as the AI assistant creates multiple files and populates them with code. The file explorer will      |
 |                                                                                                               |
