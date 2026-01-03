@@ -110,7 +110,7 @@ associated with "vibe coding."
 +---------------------------------------------------------------------------------------------------------------+
 | 2. Identify potential security vulnerabilities in the generated code. Common vulnerabilities in AI-generated  |
 |                                                                                                               |
-|    code may include:                                                                                              |
+|    code may include:                                                                                          |
 |                                                                                                               |
 |    * **SQL Injection (SQLi):** Unsanitized user inputs in database queries                                    |
 |    * **Cross-Site Scripting (XSS):** Improper output encoding                                                 |
