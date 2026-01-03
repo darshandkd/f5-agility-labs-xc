@@ -110,17 +110,13 @@ associated with "vibe coding."
 +---------------------------------------------------------------------------------------------------------------+
 | 2. Identify potential security vulnerabilities in the generated code. Common vulnerabilities in AI-generated  |
 |                                                                                                               |
-|    code include:                                                                                              |
+|    code may include:                                                                                              |
 |                                                                                                               |
 |    * **SQL Injection (SQLi):** Unsanitized user inputs in database queries                                    |
 |    * **Cross-Site Scripting (XSS):** Improper output encoding                                                 |
 |    * **Log Injection:** Unsanitized data written to logs                                                      |
 |    * **Hardcoded Secrets:** API keys or credentials embedded in code                                          |
 |                                                                                                               |
-| |module1-vulnerabilities|                                                                                     |
-|                                                                                                               |
-| .. note::                                                                                                     |
-|    *Recent studies show approximately 45% of AI-generated code samples contain known vulnerabilities.*        |
 +---------------------------------------------------------------------------------------------------------------+
 | 3. Your instructor will demonstrate a pre-scanned application using F5XC WAS to show the types of             |
 |                                                                                                               |
