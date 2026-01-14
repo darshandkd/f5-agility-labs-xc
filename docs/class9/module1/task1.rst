@@ -197,7 +197,7 @@ associated with Vibe Coding.
 |    * **Log Injection:** Unsanitized data written to logs                                                      |
 |    * **Hardcoded Secrets:** API keys or credentials embedded directly in code                                 |
 |                                                                                                               |
-| |module1-vulnerabilities|                                                                                     |
+|                                                                                                               |
 |                                                                                                               |
 | .. warning::                                                                                                  |
 |    *This is the core danger of Vibe Coding: the AI creates functional code that appears correct but*          |
