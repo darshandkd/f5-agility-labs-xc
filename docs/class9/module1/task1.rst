@@ -253,7 +253,7 @@ associated with Vibe Coding.
 |                                                                                                               |
 | Proceed to **Module 2** to deploy and secure the vulnerable application using F5 Distributed Cloud.           |
 |                                                                                                               |
-| |labend|                                                                                                      |
+|                                                                                                               |
 +---------------------------------------------------------------------------------------------------------------+
 
 .. |module1-vscode_browser| image:: ../_static/module1-vscode_browser.png
