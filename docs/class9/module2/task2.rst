@@ -1,381 +1,373 @@
-Module 2: Deploy and Secure Vulnerable App
-==========================================
+Module 2: Deploy and Secure F5 AI-Generated App
+===============================================
 
-This module guides you through deploying a pre-established vulnerable application using GitLab CI/CD
-pipelines and securing it with F5 Distributed Cloud (F5 XC) services. You will experience the complete
-DevSecOps workflow from code commit to production deployment with integrated security controls.
+This module guides you through deploying a pre-vetted vulnerable application using GitLab CI/CD
+pipelines and securing it with F5 Distributed Cloud (F5XC) services. You will experience Policy-as-Code
+enforcement, observe pipeline failures, and validate security controls through attack testing.
+
+.. note::
+   **Pre-Vetted Application**
+
+   Unlike the throwaway demo in Module 1, this module uses a **pre-vetted vulnerable application** that
+   has been specifically prepared for the CI/CD pipeline exercises. While it contains intentional
+   vulnerabilities for learning purposes, the application structure is consistent across all attendees.
 
 In this module, you will:
 
-* Commit a pre-established vulnerable application to GitLab
-* Experience automated SAST and Secret Detection in CI/CD pipelines
-* Deploy the application to F5XC vK8s using Terraform
-* Configure WAF, Bot Defense, and API Protection
-* Trigger attack scripts to test security controls
+* Switch to the Module 2 VSCode workspace and review the F5 AI-generated application
+* Access GitLab CE and explore the pre-created repository with CI/CD pipeline configuration
+* Create a ``security-controls.yaml`` file implementing Policy-as-Code
+* Observe pipeline failure due to WAF disabled, then fix and re-deploy
+* Deploy the application with F5XC security controls (WAF, vK8s workload, HTTPS LB)
+* Launch attacks against the deployed application and review security events
 
 **Expected Lab Time: 45-50 minutes**
 
-Task 1: Commit Pre-Established Vulnerable Application Code
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----
 
-The following steps will allow you to commit the pre-created vulnerable application to GitLab CE,
-triggering the automated CI/CD pipeline that builds, scans, and deploys the application.
+Task 1: Commit Pre-Created F5 AI-Generated App
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following steps will guide you through switching to the Module 2 workspace, exploring the
+pre-created application and GitLab repository, creating security controls, and triggering the
+CI/CD pipeline.
 
 +---------------------------------------------------------------------------------------------------------------+
-| **Open Pre-Created Vulnerable Application**                                                                   |
+| **Switch to Module 2 Workspace**                                                                              |
 +===============================================================================================================+
-| 1. In VSCode Server, navigate to the project directory containing the pre-created vulnerable application.     |
+| 1. In VSCode Server, click **File > Open Folder** (or use the Explorer sidebar).                              |
 |                                                                                                               |
-|    Use the File Explorer in the sidebar to browse to the project folder.                                      |
-|                                                                                                               |
-| |module2-project_directory|                                                                                   |
+| |module2-open-module2-workspace-1|                                                                            |
 +---------------------------------------------------------------------------------------------------------------+
-| 2. Explore the application structure and review the key files. The application should contain the following   |
+| 2. Navigate to the **Module 2** workspace directory and click **Open**.                                       |
 |                                                                                                               |
-|    structure:                                                                                                 |
-|                                                                                                               |
-|    * **src/** - Application source code                                                                       |
-|    * **Dockerfile** - Container build configuration                                                           |
-|    * **requirements.txt** - Python dependencies                                                               |
-|    * **.gitlab-ci.yml** - CI/CD pipeline configuration                                                        |
-|    * **terraform/** - Infrastructure as Code for F5XC deployment                                              |
-|                                                                                                               |
-| |module2-file_structure|                                                                                      |
+| |module2-open-module2-workspace-2|                                                                            |
 +---------------------------------------------------------------------------------------------------------------+
-| 3. Open and review the main application files to understand the code structure. Click on **app.py** or the    |
+| 3. Review the F5 AI-generated application structure. The application contains intentional vulnerabilities     |
 |                                                                                                               |
-|    main application file to view its contents.                                                                |
+|    that will be protected by F5XC security controls after deployment.                                         |
 |                                                                                                               |
-| |module2-review_code|                                                                                         |
+| |module2-app-1|                                                                                               |
 +---------------------------------------------------------------------------------------------------------------+
 
 +---------------------------------------------------------------------------------------------------------------+
-| **Commit and Push to GitLab**                                                                                 |
+| **Access GitLab CE and Explore Repository**                                                                   |
 +===============================================================================================================+
-| 1. Open the **Source Control** panel in VSCode by clicking the branch icon in the sidebar, or use the         |
+| 1. Open a new browser tab and navigate to your GitLab CE instance URL provided by your instructor.            |
 |                                                                                                               |
-|    integrated terminal.                                                                                       |
-|                                                                                                               |
-| |module2-source_control|                                                                                      |
+| |module2-gitlab-access|                                                                                       |
 +---------------------------------------------------------------------------------------------------------------+
-| 2. Stage all changes by clicking the **+** icon next to **Changes** or by running the following command in    |
+| 2. Sign in using your lab credentials.                                                                        |
 |                                                                                                               |
-|    the terminal:                                                                                              |
-|                                                                                                               |
-| .. code-block:: bash                                                                                          |
-|                                                                                                               |
-|    git add .                                                                                                  |
-|                                                                                                               |
-| |module2-git_add|                                                                                             |
+| |module2-gitlab-login|                                                                                        |
 +---------------------------------------------------------------------------------------------------------------+
-| 3. Enter a commit message describing your changes in the **Message** field:                                   |
+| 3. From the GitLab dashboard, locate and click on your student project.                                       |
 |                                                                                                               |
-|    *Initial commit: Pre-established vulnerable application for lab*                                           |
-|                                                                                                               |
-| |module2-commit_message|                                                                                      |
+| |module2-gitlab-student-dashboard|                                                                            |
 +---------------------------------------------------------------------------------------------------------------+
-| 4. Commit the changes by clicking the **Commit** button or running:                                           |
+| 4. Explore the repository structure. Note the application code and the ``.gitlab-ci.yml`` file that defines   |
 |                                                                                                               |
-| .. code-block:: bash                                                                                          |
+|    the CI/CD pipeline configuration.                                                                          |
 |                                                                                                               |
-|    git commit -m "Initial commit: Pre-established vulnerable application for lab"                             |
-|                                                                                                               |
-| |module2-git_commit|                                                                                          |
+| |module2-gitlab-student-project-1|                                                                            |
 +---------------------------------------------------------------------------------------------------------------+
-| 5. Push the changes to GitLab CE by clicking **Sync Changes** or running:                                     |
+| 5. Review the CI/CD pipeline configuration. The pipeline includes four stages that will execute automatically |
 |                                                                                                               |
-| .. code-block:: bash                                                                                          |
+|    when code is committed:                                                                                    |
 |                                                                                                               |
-|    git push origin main                                                                                       |
+|    * **policy_gate** - Evaluates ``security-controls.yaml`` (enforces WAF minimum requirement)                |
+|    * **test** - Simple SAST test using pytest                                                                 |
+|    * **build** - Docker build and push to Google Artifacts                                                    |
+|    * **deploy** - Deploy F5XC security controls via Terraform                                                 |
 |                                                                                                               |
-| |module2-git_push|                                                                                            |
+| |module2-gitlab-student-project-2|                                                                            |
 +---------------------------------------------------------------------------------------------------------------+
 
 +---------------------------------------------------------------------------------------------------------------+
-| **Observe CI/CD Pipeline Execution**                                                                          |
+| **Create security-controls.yaml (Policy-as-Code)**                                                            |
 +===============================================================================================================+
-| 1. Open GitLab CE in your browser and navigate to your project. Use the URL provided in your lab environment. |
+| **What is Policy-as-Code?**                                                                                   |
 |                                                                                                               |
-| |module2-gitlab_project|                                                                                      |
+| Policy-as-Code is a DevSecOps practice where security policies are defined in version-controlled              |
+| configuration files. This enables automated enforcement of security requirements during CI/CD                 |
+| pipelines, ensuring that insecure configurations never reach production.                                      |
+|                                                                                                               |
+| In this lab, the ``policy_gate`` stage validates that WAF protection is enabled before allowing               |
+| deployment to proceed.                                                                                        |
 +---------------------------------------------------------------------------------------------------------------+
-| 2. Navigate to **CI/CD > Pipelines** in the left sidebar to view the triggered pipeline.                      |
+| 1. Return to VSCode Server. In the Explorer sidebar, right-click in the project root and select               |
 |                                                                                                               |
-| |module2-pipeline_view|                                                                                       |
+|    **New File**.                                                                                              |
+|                                                                                                               |
+| |module2-vscode-cretate-security-control-1|                                                                   |
 +---------------------------------------------------------------------------------------------------------------+
-| 3. Observe the pipeline stages executing. The pipeline includes the following stages:                         |
+| 2. Name the file ``security-controls.yaml`` and press Enter.                                                  |
 |                                                                                                               |
-|    * **SAST** - Static Application Security Testing                                                           |
-|    * **Secret Detection** - Scan for exposed secrets and credentials                                          |
-|    * **Build** - Source-to-container build (Image v1.0)                                                       |
-|    * **Push** - Push container image to registry                                                              |
-|    * **Deploy** - Terraform deployment to F5XC vK8s                                                           |
+| |module2-vscode-cretate-security-control-2|                                                                   |
++---------------------------------------------------------------------------------------------------------------+
+| 3. Copy and paste the following content into the file:                                                        |
 |                                                                                                               |
-| |module2-pipeline_stages|                                                                                     |
+| .. code-block:: yaml                                                                                          |
+|                                                                                                               |
+|    # security-controls.yaml                                                                                   |
+|    # Policy-as-Code configuration for F5XC security controls                                                  |
+|    security:                                                                                                  |
+|      waf: disable           # WAF protection status - INTENTIONALLY DISABLED                                  |
+|      bot_defense: enable    # Bot defense status                                                              |
+|      api_protection: enable # API protection status                                                           |
+|                                                                                                               |
+| |module2-vscode-cretate-security-control-3|                                                                   |
 |                                                                                                               |
 | .. note::                                                                                                     |
-|    *The pipeline may take several minutes to complete all stages. Wait for all stages to finish before*       |
-|    *proceeding to the next step.*                                                                             |
+|    *The WAF setting is deliberately set to* ``disable`` *to demonstrate Policy-as-Code enforcement.*          |
+|    *The pipeline will fail at the* ``policy_gate`` *stage, showing how security requirements are*             |
+|    *enforced before deployment.*                                                                              |
 +---------------------------------------------------------------------------------------------------------------+
-| 4. **Alternative Flow - Secret Detection Failure:** If the pipeline fails due to exposed secrets in the       |
+| 4. Save the file (**Ctrl+S** or **Cmd+S**).                                                                   |
++---------------------------------------------------------------------------------------------------------------+
+
++---------------------------------------------------------------------------------------------------------------+
+| **Commit and Push to GitLab CE**                                                                              |
++===============================================================================================================+
+| 1. Open the **Source Control** panel in VSCode by clicking the branch icon in the sidebar.                    |
 |                                                                                                               |
-|    application code, you will need to correct the issue.                                                      |
+| |module2-vscode-cretate-security-control-4-commit|                                                            |
++---------------------------------------------------------------------------------------------------------------+
+| 2. If prompted with a warning about staging changes, click **Yes** to stage all changes.                      |
 |                                                                                                               |
-|    a. Review the pipeline error in GitLab by clicking on the failed job                                       |
-|    b. Return to VSCode and correct the exposed secret in the code                                             |
-|    c. Commit and push the fix using the same steps above                                                      |
-|    d. The pipeline will re-trigger automatically                                                              |
+| |module2-vscode-cretate-security-control-4-commit-warning|                                                    |
++---------------------------------------------------------------------------------------------------------------+
+| 3. Enter a commit message: ``Add security-controls.yaml with WAF disabled``                                   |
 |                                                                                                               |
-| |module2-secret_failure|                                                                                      |
+| 4. Click the **Commit** button (checkmark icon).                                                              |
++---------------------------------------------------------------------------------------------------------------+
+| 5. If prompted for Git credentials, enter your GitLab username.                                               |
+|                                                                                                               |
+| |module2-vscode-cretate-security-control-git-username|                                                        |
++---------------------------------------------------------------------------------------------------------------+
+| 6. Click **Sync Changes** to push to GitLab CE.                                                               |
+|                                                                                                               |
+| |module2-vscode-cretate-security-control-4-sync|                                                              |
++---------------------------------------------------------------------------------------------------------------+
+| 7. If prompted with a sync warning, click **OK** to proceed.                                                  |
+|                                                                                                               |
+| |module2-vscode-cretate-security-control-4-sync-warning|                                                      |
++---------------------------------------------------------------------------------------------------------------+
+
++---------------------------------------------------------------------------------------------------------------+
+| **Observe Pipeline Failure (Policy Gate)**                                                                    |
++===============================================================================================================+
+| 1. Return to GitLab CE in your browser. Navigate to **CI/CD > Pipelines** in the left sidebar.                |
++---------------------------------------------------------------------------------------------------------------+
+| 2. Observe the pipeline executing. The pipeline will **fail** at the **policy_gate** stage because            |
+|                                                                                                               |
+|    WAF is set to ``disable`` in ``security-controls.yaml``.                                                   |
+|                                                                                                               |
+| .. note::                                                                                                     |
+|    *This demonstrates the "Secure" part of the DevSecOps loop. Policy-as-Code prevents insecure*              |
+|    *configurations from reaching production. The pipeline enforces that WAF must be enabled.*                 |
++---------------------------------------------------------------------------------------------------------------+
+| 3. Click on the failed pipeline to view details. Note the error message indicating WAF requirement.           |
++---------------------------------------------------------------------------------------------------------------+
+
++---------------------------------------------------------------------------------------------------------------+
+| **Fix Policy-as-Code and Re-deploy**                                                                          |
++===============================================================================================================+
+| 1. Return to VSCode Server and open ``security-controls.yaml``.                                               |
++---------------------------------------------------------------------------------------------------------------+
+| 2. Change the WAF setting from ``disable`` to ``enable``:                                                     |
+|                                                                                                               |
+| .. code-block:: yaml                                                                                          |
+|                                                                                                               |
+|    # security-controls.yaml                                                                                   |
+|    # Policy-as-Code configuration for F5XC security controls                                                  |
+|    security:                                                                                                  |
+|      waf: enable            # Changed from 'disable' to 'enable'                                              |
+|      bot_defense: enable                                                                                      |
+|      api_protection: enable                                                                                   |
++---------------------------------------------------------------------------------------------------------------+
+| 3. Save the file, then commit and push the change:                                                            |
+|                                                                                                               |
+|    * Stage the change in Source Control                                                                       |
+|    * Commit message: ``Enable WAF in security controls``                                                      |
+|    * Sync Changes to push to GitLab CE                                                                        |
++---------------------------------------------------------------------------------------------------------------+
+| 4. Return to GitLab CE and observe the new pipeline. This time, all four stages should **succeed**:           |
+|                                                                                                               |
+|    * **policy_gate** - Passes (WAF is now enabled)                                                            |
+|    * **test** - SAST tests pass                                                                               |
+|    * **build** - Docker image v1.0 built and pushed to Google Artifacts                                       |
+|    * **deploy** - Terraform creates F5XC resources                                                            |
 +---------------------------------------------------------------------------------------------------------------+
 
 +---------------------------------------------------------------------------------------------------------------+
 | **Verify Automated Deployment**                                                                               |
 +===============================================================================================================+
-| 1. Once the pipeline succeeds, verify that the **Container Image v1.0** has been pushed to the container      |
+| Once the pipeline succeeds, the following resources are automatically created via Terraform:                  |
 |                                                                                                               |
-|    registry. Navigate to **Packages & Registries > Container Registry** in GitLab.                            |
-|                                                                                                               |
-| |module2-container_registry|                                                                                  |
-+---------------------------------------------------------------------------------------------------------------+
-| 2. Log in to the F5XC Console and navigate to **Distributed Apps > Virtual K8s** to verify the **vK8s         |
-|                                                                                                               |
-|    Workload** has been deployed.                                                                              |
-|                                                                                                               |
-| |module2-vk8s_workload|                                                                                       |
-+---------------------------------------------------------------------------------------------------------------+
-| 3. Navigate to **Multi-Cloud App Connect > Manage > Load Balancers > Origin Pools** to verify the **Origin    |
-|                                                                                                               |
-|    Pool** has been created and is pointing to the vK8s workload.                                              |
-|                                                                                                               |
-| |module2-origin_pool|                                                                                         |
-+---------------------------------------------------------------------------------------------------------------+
-| 4. Navigate to **Multi-Cloud App Connect > Manage > Load Balancers > HTTP Load Balancers** to verify the      |
-|                                                                                                               |
-|    **HTTP Load Balancer** has been configured with the following security controls:                           |
-|                                                                                                               |
-|    * WAF policy attached                                                                                      |
-|    * Bot Defense enabled                                                                                      |
-|    * API Protection enabled                                                                                   |
-|                                                                                                               |
-| |module2-http_lb|                                                                                             |
-+---------------------------------------------------------------------------------------------------------------+
-| 5. Note the public URL of your deployed application from the HTTP Load Balancer configuration. You will need  |
-|                                                                                                               |
-|    this URL for the next task.                                                                                |
-|                                                                                                               |
-| |module2-f5xc_verification|                                                                                   |
+|    * **Container Image v1.0** - Pushed to Google Artifacts registry                                           |
+|    * **vK8s Workload** - Application deployed to F5XC Virtual Kubernetes                                      |
+|    * **Origin Pool** - Backend configuration pointing to vK8s workload                                        |
+|    * **Health Check** - Monitors application availability                                                     |
+|    * **HTTPS Load Balancer** - Frontend with WAF policy attached                                              |
+|    * **WAF Policy** - Web Application Firewall protection enabled                                             |
 +---------------------------------------------------------------------------------------------------------------+
 
-Task 2: Trigger Simple Attack Script
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The following steps will allow you to execute attack scripts against the deployed vulnerable
-application to test the effectiveness of the F5XC security controls.
-
 +---------------------------------------------------------------------------------------------------------------+
-| **Identify Application URL and Verify Access**                                                                |
+| **Access the Deployed Application**                                                                           |
 +===============================================================================================================+
-| 1. Retrieve the public URL of your deployed application from the HTTP Load Balancer configuration noted in    |
+| 1. Your deployed application is accessible at:                                                                |
 |                                                                                                               |
-|    the previous task.                                                                                         |
+|    ``https://<NAMESPACE>-lb.lab-app.f5demos.com``                                                              |
 |                                                                                                               |
-| |module2-app_url|                                                                                             |
+|    Replace ``<NAMESPACE>`` with your assigned namespace.                                                      |
 +---------------------------------------------------------------------------------------------------------------+
-| 2. Open the application URL in your browser to verify the application is accessible and functioning.          |
+| 2. Open the application URL in your browser to verify it is accessible.                                       |
 |                                                                                                               |
-| |module2-app_accessible|                                                                                      |
+| |module2-app-home-page|                                                                                       |
 +---------------------------------------------------------------------------------------------------------------+
 
 +---------------------------------------------------------------------------------------------------------------+
-| **Execute Attack Scripts**                                                                                    |
+| **Objective Check: Code. Secure. Repeat.**                                                                    |
 +===============================================================================================================+
-| 1. Open a terminal in VSCode Server by selecting **Terminal > New Terminal** from the menu, or access the     |
+| In this task, you completed the **COMMIT**, **SCAN**, and **DEPLOY** phases of the DevSecOps loop:            |
 |                                                                                                               |
-|    client VM terminal.                                                                                        |
+|    ✓ **COMMIT:** You pushed code with security controls to GitLab CE                                          |
+|    ✓ **POLICY GATE:** You observed Policy-as-Code enforcement blocking insecure configurations                |
+|    ✓ **SCAN:** SAST testing validated the application code                                                    |
+|    ✓ **DEPLOY:** Terraform provisioned F5XC infrastructure with security controls                             |
 |                                                                                                               |
-| |module2-terminal|                                                                                            |
+| **Key Takeaway:** Policy-as-Code ensures security requirements are enforced automatically, preventing         |
+| insecure configurations from reaching production.                                                             |
+|                                                                                                               |
+|    **Code → Commit → Scan → Protect → Improve → Repeat**                                                      |
 +---------------------------------------------------------------------------------------------------------------+
-| 2. Navigate to the attack scripts directory provided in your lab environment:                                 |
-|                                                                                                               |
-| .. code-block:: bash                                                                                          |
-|                                                                                                               |
-|    cd /path/to/attack-scripts                                                                                 |
-|                                                                                                               |
-| |module2-attack_scripts_dir|                                                                                  |
+
+----
+
+Task 2: Attack the Deployed Application
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In this task, you will launch simple attacks against the deployed F5 AI-generated application to
+verify that F5XC WAF is actively protecting it. You will then review security events in the F5XC
+Console.
+
 +---------------------------------------------------------------------------------------------------------------+
-| 3. Review the available attack scripts by listing the directory contents:                                     |
+| **Browser-Based Attack Testing**                                                                              |
++===============================================================================================================+
+| 1. Open your application URL in a browser:                                                                    |
 |                                                                                                               |
-| .. code-block:: bash                                                                                          |
-|                                                                                                               |
-|    ls -la                                                                                                     |
-|                                                                                                               |
-| |module2-attack_scripts|                                                                                      |
+|    ``https://<NAMESPACE>-lb.lab-app.f5demos.com``                                                              |
 +---------------------------------------------------------------------------------------------------------------+
-| 4. Execute the **SQL Injection** attack script against your application:                                      |
+| 2. Test a **SQL Injection** attack by appending an attack payload to the URL:                                 |
 |                                                                                                               |
-| .. code-block:: bash                                                                                          |
-|                                                                                                               |
-|    ./sqli_attack.sh <YOUR_APP_URL>                                                                            |
-|                                                                                                               |
-| |module2-sqli_attack|                                                                                         |
+|    ``https://<NAMESPACE>-lb.lab-app.f5demos.com/<script>alert('XSS')</script>``                                |
 |                                                                                                               |
 | .. note::                                                                                                     |
-|    *Replace <YOUR_APP_URL> with the actual URL of your deployed application.*                                 |
+|    *Your instructor may provide alternative attack paths based on the application endpoints.*                 |
 +---------------------------------------------------------------------------------------------------------------+
-| 5. Execute the **Cross-Site Scripting (XSS)** attack script:                                                  |
+| 3. Observe the response. You should see a **403 Forbidden** error or a WAF block page, indicating the         |
 |                                                                                                               |
-| .. code-block:: bash                                                                                          |
-|                                                                                                               |
-|    ./xss_attack.sh <YOUR_APP_URL>                                                                             |
-|                                                                                                               |
-| |module2-xss_attack|                                                                                          |
+|    malicious request was blocked before reaching the application.                                             |
 +---------------------------------------------------------------------------------------------------------------+
-| 6. Execute additional attack scripts as provided by your instructor:                                          |
+| 4. Try additional attack patterns:                                                                            |
 |                                                                                                               |
-| .. code-block:: bash                                                                                          |
-|                                                                                                               |
-|    ./bot_attack.sh <YOUR_APP_URL>                                                                             |
-|    ./api_abuse.sh <YOUR_APP_URL>                                                                              |
-|                                                                                                               |
-| |module2-additional_attacks|                                                                                  |
+|    * **XSS:** ``https://<NAMESPACE>-lb.lab-app.f5demos.com/?q=<script>alert(1)</script>``                      |
+|    * **SQLi:** ``https://<NAMESPACE>-lb.lab-app.f5demos.com/?id=1' OR '1'='1``                                 |
+|    * **Path Traversal:** ``https://<NAMESPACE>-lb.lab-app.f5demos.com/../../../etc/passwd``                    |
 +---------------------------------------------------------------------------------------------------------------+
 
 +---------------------------------------------------------------------------------------------------------------+
-| **Review Attack Results in F5XC Console**                                                                     |
+| **Review Security Events in F5XC Console**                                                                    |
 +===============================================================================================================+
-| 1. Log in to the F5XC Console and navigate to **Web App & API Protection** from the home dashboard.           |
-|                                                                                                               |
-| |module2-waap_dashboard|                                                                                      |
+| 1. Log in to the F5 Distributed Cloud Console.                                                                |
 +---------------------------------------------------------------------------------------------------------------+
-| 2. Navigate to **Dashboards > Security Dashboard** to view an overview of detected attacks and security       |
-|                                                                                                               |
-|    events.                                                                                                    |
-|                                                                                                               |
-| |module2-security_analytics|                                                                                  |
+| 2. Navigate to **Web App & API Protection** from the home dashboard.                                          |
 +---------------------------------------------------------------------------------------------------------------+
-| 3. Review the **Security Events** log by navigating to **Apps & APIs > Security > Security Analytics**. You   |
-|                                                                                                               |
-|    should see events corresponding to your attack scripts:                                                    |
+| 3. Select your HTTP Load Balancer (``<NAMESPACE>-lb``).                                                       |
++---------------------------------------------------------------------------------------------------------------+
+| 4. Navigate to **Security Analytics** to view detected attacks and security events.                           |
++---------------------------------------------------------------------------------------------------------------+
+| 5. Review the **Security Events** log. You should see events corresponding to your attacks:                   |
 |                                                                                                               |
 |    * **SQL Injection** - WAF Signature Match - Blocked                                                        |
 |    * **XSS** - WAF Signature Match - Blocked                                                                  |
-|    * **Bot Traffic** - Bot Defense - Flagged/Blocked                                                          |
-|    * **API Abuse** - API Protection - Rate Limited/Blocked                                                    |
-|                                                                                                               |
-| |module2-security_events|                                                                                     |
+|    * **Path Traversal** - WAF Signature Match - Blocked                                                       |
 +---------------------------------------------------------------------------------------------------------------+
-| 4. Click on an individual security event to drill down and view detailed information:                         |
+| 6. Click on an individual security event to view detailed information:                                        |
 |                                                                                                               |
 |    * Attack signature matched                                                                                 |
-|    * Request details (headers, payload)                                                                       |
-|    * Action taken (blocked, flagged, allowed)                                                                 |
-|    * Source IP and geo-location                                                                               |
-|                                                                                                               |
-| |module2-event_details|                                                                                       |
-+---------------------------------------------------------------------------------------------------------------+
-| 5. Navigate to **Apps & APIs > Security > WAF** to review the WAF Dashboard showing an overview of blocked    |
-|                                                                                                               |
-|    attacks.                                                                                                   |
-|                                                                                                               |
-| |module2-waf_dashboard|                                                                                       |
+|    * Request details (headers, payload, URI)                                                                  |
+|    * Action taken (blocked)                                                                                   |
+|    * Source IP and timestamp                                                                                  |
 +---------------------------------------------------------------------------------------------------------------+
 
 +---------------------------------------------------------------------------------------------------------------+
-| **Analyze Bot Defense Signals**                                                                               |
+| **Objective Check: Code. Secure. Repeat.**                                                                    |
 +===============================================================================================================+
-| 1. Navigate to **Apps & APIs > Security > Bot Defense** in the F5XC Console.                                  |
+| In this task, you completed the **PROTECT** and **TEST** phases of the DevSecOps loop:                        |
 |                                                                                                               |
-| |module2-bot_defense|                                                                                         |
+|    ✓ **PROTECT:** F5XC WAF actively blocked malicious requests                                                |
+|    ✓ **TEST:** You verified security controls with browser-based attacks                                      |
+|    ✓ **ANALYZE:** You reviewed security events and attack details in F5XC Console                             |
+|                                                                                                               |
+| **Key Takeaway:** F5XC WAAP provides real-time protection against OWASP Top 10 attacks. Security events       |
+| provide visibility into attack patterns and inform continuous improvement.                                    |
+|                                                                                                               |
+|    **Code → Commit → Scan → Protect → Improve → Repeat**                                                      |
 +---------------------------------------------------------------------------------------------------------------+
-| 2. Review the bot classification and signals displayed in the dashboard:                                      |
-|                                                                                                               |
-|    * Automated traffic detection                                                                              |
-|    * Bot signatures identified                                                                                |
-|    * Mitigation actions applied                                                                               |
-|                                                                                                               |
-| |module2-bot_signals|                                                                                         |
-+---------------------------------------------------------------------------------------------------------------+
+
+----
 
 +---------------------------------------------------------------------------------------------------------------+
 | **End of Module 2**                                                                                           |
 +===============================================================================================================+
-| This concludes Module 2. In this module, you learned about the complete DevSecOps workflow from code commit   |
+| This concludes Module 2. In this module, you learned:                                                         |
 |                                                                                                               |
-| to production deployment with integrated security controls. Key takeaways:                                    |
-|                                                                                                               |
-|    * GitLab CI/CD provides automated SAST, Secret Detection, and deployment pipelines                         |
-|    * Terraform enables Infrastructure as Code deployment of F5XC resources                                    |
-|    * F5XC WAAP provides comprehensive protection with WAF, Bot Defense, and API Protection                    |
-|    * Security visibility through real-time attack detection and comprehensive logging                         |
+|    * **Policy-as-Code** enforces security requirements in CI/CD pipelines                                     |
+|    * **GitLab CI/CD** automates testing, building, and deployment                                             |
+|    * **Terraform** provisions F5XC infrastructure (vK8s, Origin, LB, WAF)                                     |
+|    * **F5XC WAF** actively protects applications against common attacks                                       |
+|    * **Security Analytics** provides visibility into attack patterns                                          |
 |                                                                                                               |
 | Proceed to **Module 3** to add advanced security controls and API functionality.                              |
 |                                                                                                               |
 | |labend|                                                                                                      |
 +---------------------------------------------------------------------------------------------------------------+
 
-.. |module2-project_directory| image:: _static/module2-project_directory.png
+.. |module2-open-module2-workspace-1| image:: ../_static/module2-open-module2-workspace-1.png
    :width: 800px
-.. |module2-file_structure| image:: _static/module2-file_structure.png
+.. |module2-open-module2-workspace-2| image:: ../_static/module2-open-module2-workspace-2.png
    :width: 800px
-.. |module2-review_code| image:: _static/module2-review_code.png
+.. |module2-app-1| image:: ../_static/module2-app-1.png
    :width: 800px
-.. |module2-source_control| image:: _static/module2-source_control.png
+.. |module2-gitlab-access| image:: ../_static/module2-gitlab-access.png
    :width: 800px
-.. |module2-git_add| image:: _static/module2-git_add.png
+.. |module2-gitlab-login| image:: ../_static/module2-gitlab-login.png
    :width: 800px
-.. |module2-commit_message| image:: _static/module2-commit_message.png
+.. |module2-gitlab-student-dashboard| image:: ../_static/module2-gitlab-student-dashboard.png
    :width: 800px
-.. |module2-git_commit| image:: _static/module2-git_commit.png
+.. |module2-gitlab-student-project-1| image:: ../_static/module2-gitlab-student-project-1.png
    :width: 800px
-.. |module2-git_push| image:: _static/module2-git_push.png
+.. |module2-gitlab-student-project-2| image:: ../_static/module2-gitlab-student-project-2.png
    :width: 800px
-.. |module2-gitlab_project| image:: _static/module2-gitlab_project.png
+.. |module2-vscode-cretate-security-control-1| image:: ../_static/module2-vscode-cretate-security-control-1.png
    :width: 800px
-.. |module2-pipeline_view| image:: _static/module2-pipeline_view.png
+.. |module2-vscode-cretate-security-control-2| image:: ../_static/module2-vscode-cretate-security-control-2.png
    :width: 800px
-.. |module2-pipeline_stages| image:: _static/module2-pipeline_stages.png
+.. |module2-vscode-cretate-security-control-3| image:: ../_static/module2-vscode-cretate-security-control-3.png
    :width: 800px
-.. |module2-secret_failure| image:: _static/module2-secret_failure.png
+.. |module2-vscode-cretate-security-control-4-commit| image:: ../_static/module2-vscode-cretate-security-control-4-commit.png
    :width: 800px
-.. |module2-container_registry| image:: _static/module2-container_registry.png
+.. |module2-vscode-cretate-security-control-4-commit-warning| image:: ../_static/module2-vscode-cretate-security-control-4-commit-warning.png
    :width: 800px
-.. |module2-vk8s_workload| image:: _static/module2-vk8s_workload.png
+.. |module2-vscode-cretate-security-control-git-username| image:: ../_static/module2-vscode-cretate-security-control-git-username.png
    :width: 800px
-.. |module2-origin_pool| image:: _static/module2-origin_pool.png
+.. |module2-vscode-cretate-security-control-4-sync| image:: ../_static/module2-vscode-cretate-security-control-4-sync.png
    :width: 800px
-.. |module2-http_lb| image:: _static/module2-http_lb.png
+.. |module2-vscode-cretate-security-control-4-sync-warning| image:: ../_static/module2-vscode-cretate-security-control-4-sync-warning.png
    :width: 800px
-.. |module2-f5xc_verification| image:: _static/module2-f5xc_verification.png
+.. |module2-app-home-page| image:: ../_static/module2-app-home-page.png
    :width: 800px
-.. |module2-app_url| image:: _static/module2-app_url.png
-   :width: 800px
-.. |module2-app_accessible| image:: _static/module2-app_accessible.png
-   :width: 800px
-.. |module2-terminal| image:: _static/module2-terminal.png
-   :width: 800px
-.. |module2-attack_scripts_dir| image:: _static/module2-attack_scripts_dir.png
-   :width: 800px
-.. |module2-attack_scripts| image:: _static/module2-attack_scripts.png
-   :width: 800px
-.. |module2-sqli_attack| image:: _static/module2-sqli_attack.png
-   :width: 800px
-.. |module2-xss_attack| image:: _static/module2-xss_attack.png
-   :width: 800px
-.. |module2-additional_attacks| image:: _static/module2-additional_attacks.png
-   :width: 800px
-.. |module2-waap_dashboard| image:: _static/module2-waap_dashboard.png
-   :width: 800px
-.. |module2-security_analytics| image:: _static/module2-security_analytics.png
-   :width: 800px
-.. |module2-security_events| image:: _static/module2-security_events.png
-   :width: 800px
-.. |module2-event_details| image:: _static/module2-event_details.png
-   :width: 800px
-.. |module2-waf_dashboard| image:: _static/module2-waf_dashboard.png
-   :width: 800px
-.. |module2-bot_defense| image:: _static/module2-bot_defense.png
-   :width: 800px
-.. |module2-bot_signals| image:: _static/module2-bot_signals.png
-   :width: 800px
-.. |labend| image:: _static/labend.png
+.. |labend| image:: ../_static/labend.png
    :width: 800px
