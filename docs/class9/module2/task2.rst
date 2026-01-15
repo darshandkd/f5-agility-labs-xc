@@ -332,7 +332,7 @@ Console.
 |                                                                                                               |
 | Proceed to **Module 3** to add advanced security controls and API functionality.                              |
 |                                                                                                               |
-| |labend|                                                                                                      |
+|                                                                                                               |
 +---------------------------------------------------------------------------------------------------------------+
 
 .. |module2-open-module2-workspace-1| image:: ../_static/module2-open-module2-workspace-1.png
