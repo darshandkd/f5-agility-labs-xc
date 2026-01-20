@@ -1,9 +1,9 @@
-Module 1: AI-Generated Vulnerable App
-======================================
+Module 1: AI-Generated Vulnerable App (Demo Only)
+=================================================
 
-This module introduces you to AI-assisted coding using the Cline Extension in Visual Studio
-Code. You will generate a vulnerable application using pre-canned prompts and observe both
-the benefits and security risks of AI-generated code.
+This module is a demonstration of **AI-assisted "Vibe Coding"** and how it can introduce
+typical flaws and vulnerabilities. You will generate a vulnerable application using pre-canned
+prompts and observe both the benefits and security risks of AI-generated code.
 
 The goal of this module is to:
 
@@ -28,8 +28,8 @@ The goal of this module is to:
 
 **Expected Lab Time: 15-20 minutes**
 
-Task 1: Explore VSCode and Cline Extension
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Task 1: Explore Cline Extension and Generate Vulnerable App
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The following steps will allow you to explore the VSCode environment and the Cline Extension
 configuration. You will then use AI to generate a vulnerable application to understand the risks
@@ -63,8 +63,7 @@ associated with Vibe Coding.
 | 2. Review the Cline Extension configuration settings. Verify the following settings are configured:           |
 |                                                                                                               |
 |    * **API Provider:** *GCP Vertex AI*                                                                        |
-|    * **Project ID:** *f5-gcs-4261-sales-appworld2026*                                                         |
-|    * **Region:** *us-central1*                                                                                |
+|    * **Google Cloud Project ID:** *f5-gcs-4261-sales-appworld2026*                                            |
 |    * **Model:** *gemini-2.5-flash*                                                                            |
 |                                                                                                               |
 | |module1-cline_config|                                                                                        |
@@ -104,16 +103,81 @@ associated with Vibe Coding.
 +===============================================================================================================+
 | 1. In the Cline Extension panel, enter the following **pre-canned prompt** to generate a vulnerable           |
 |                                                                                                               |
-|    application:                                                                                               |
+|    application. Make sure the Cline toggle is set to **Plan**:                                                |
 |                                                                                                               |
 | .. code-block:: text                                                                                          |
 |                                                                                                               |
-|    Create a simple Flask web application with the following features:                                         |
-|    - A login page that accepts username and password                                                          |
-|    - A search page that queries a SQLite database                                                             |
-|    - A comments section where users can post messages                                                         |
-|    - Store the database credentials in a config file                                                          |
-|    Make it functional but keep the code simple for demonstration purposes.                                    |
+|    ==============================================                                                              |
+|    Create a simple Flask web application for demo purposes (Module 1 - AppWorld 2026 vibe-coding demo).       |
+|                                                                                                               |
+|    High-level goal:                                                                                           |
+|    - A small, polished "conference-style" site inspired by AppWorld 2026 themes (apps, APIs, AI,              |
+|      hands-on learning).                                                                                      |
+|    - IMPORTANT: Do NOT copy text verbatim from any website. Paraphrase into original wording.                 |
+|                                                                                                               |
+|    Requirements:                                                                                               |
+|    - Use Python Flask.                                                                                        |
+|    - No authentication, no database, no external APIs.                                                        |
+|    - Single Flask app file named app.py.                                                                      |
+|    - Use Jinja2 templates.                                                                                    |
+|    - Create a modern, clean UI using Tailwind CSS via CDN (do NOT install Tailwind locally).                  |
+|    - App should be visually appealing but simple.                                                             |
+|    - Do not use the echo or open commands.                                                                    |
+|                                                                                                               |
+|    Pages / behavior:                                                                                          |
+|    1) Home page (/)                                                                                           |
+|    - A top navigation bar with links: Home, Agenda, About.                                                    |
+|    - A centered hero section:                                                                                 |
+|      - Title: "AppWorld 2026 - Code. Secure. Repeat."                                                         |
+|      - Subtitle: A short, original (paraphrased) blurb about learning to build, deliver, and protect          |
+|        apps/APIs/AI with hands-on labs.                                                                       |
+|    - A primary CTA button linking to /agenda.                                                                 |
+|    - 3 feature cards in a responsive grid (each with title + 2-3 bullet points):                              |
+|      - "Build Faster" (AI-assisted dev + CI/CD vibe, phrased generically)                                     |
+|      - "Secure by Design" (WAAP, API security, bot defense themes, phrased generically)                       |
+|      - "Repeatable Workflow" ("Code. Secure. Repeat." loop, phrased generically)                              |
+|    - A small "Highlights" strip below the cards with 3 quick stats (static placeholders):                     |
+|      - "3 Modules", "Hands-on Demos", "WAAP + API Security"                                                   |
+|                                                                                                               |
+|    2) Agenda page (/agenda)                                                                                   |
+|    - Show a simple agenda with 3 time blocks (static, fake times are OK):                                     |
+|      - "Module 0 - Orientation"                                                                               |
+|      - "Module 1 - Vibe Coding Demo"                                                                          |
+|      - "Module 2/3 - Deploy + API Discovery"                                                                  |
+|    - Each agenda item should have: Title, 1-2 line description, A "Track" badge                               |
+|      (e.g., DevSecOps, App Delivery, API Security)                                                            |
+|    - Add a tiny bit of interactivity:                                                                         |
+|      - Support a query string filter like /agenda?track=API                                                   |
+|      - If track is provided, filter agenda items server-side and show "Filtered by: ..."                      |
+|      - Provide 3 filter links/buttons at top: All, DevSecOps, API, Delivery.                                  |
+|                                                                                                               |
+|    3) About page (/about)                                                                                     |
+|    - A short paragraph explaining:                                                                            |
+|      - This is a demo-only app for a lab.                                                                     |
+|      - It intentionally stays simple (no auth/db).                                                            |
+|      - It exists to demonstrate AI-generated code + UI scaffolding.                                           |
+|    - Add a small callout panel: "Lab note: This demo is not the production app used in later modules."        |
+|                                                                                                               |
+|    UI / layout:                                                                                               |
+|    - Use templates/base.html for layout (nav + footer).                                                       |
+|    - Use templates/index.html, templates/agenda.html, templates/about.html extending base.                    |
+|    - Add a footer with small text: "Demo app for AppWorld 2026 lab - Code. Secure. Repeat."                   |
+|                                                                                                               |
+|    Technical requirements:                                                                                    |
+|    - Flask app must bind to 0.0.0.0.                                                                          |
+|    - App must be runnable with: flask run --host=0.0.0.0 --port=5000                                          |
+|    - Keep the code readable and well-commented.                                                               |
+|    - Do not include Docker, Kubernetes, CI/CD, or security features.                                          |
+|                                                                                                               |
+|    Deliverables:                                                                                              |
+|    - app.py                                                                                                   |
+|    - templates/base.html                                                                                      |
+|    - templates/index.html                                                                                     |
+|    - templates/agenda.html                                                                                    |
+|    - templates/about.html                                                                                     |
+|                                                                                                               |
+|    After generating the files, explain how to run the app using flask run.                                    |
+|    ==============================================                                                              |
 |                                                                                                               |
 | |module1-cline-demo-app-plan|                                                                                 |
 +---------------------------------------------------------------------------------------------------------------+
@@ -129,11 +193,22 @@ associated with Vibe Coding.
 +---------------------------------------------------------------------------------------------------------------+
 | 3. Allow Cline to **Act** and execute the plan. Watch as the AI creates files and writes code.                |
 |                                                                                                               |
+|    After Cline finishes coding each file, it will ask you to save the file before continuing to the           |
+|    next file.                                                                                                 |
+|                                                                                                               |
 | |module1-cline-demo-app-act|                                                                                  |
+|                                                                                                               |
+| |module1-cline-demo-app-act-2|                                                                                |
 +---------------------------------------------------------------------------------------------------------------+
 | 4. Observe the file explorer updating as new files are created. The AI will generate multiple files           |
 |                                                                                                               |
-|    including Python code, HTML templates, and configuration files.                                            |
+|    including:                                                                                                 |
+|                                                                                                               |
+|    * ``app.py`` - Flask application with routes for ``/``, ``/agenda``, and ``/about``                        |
+|    * ``templates/base.html`` - Base layout template with navigation and footer                                |
+|    * ``templates/index.html`` - Home page template                                                            |
+|    * ``templates/agenda.html`` - Agenda page template with filter functionality                               |
+|    * ``templates/about.html`` - About page template                                                           |
 |                                                                                                               |
 | |module1-cline-demo-app-act-3-task-completed|                                                                  |
 |                                                                                                               |
@@ -152,11 +227,10 @@ associated with Vibe Coding.
 |                                                                                                               |
 | |module1-cline-demo-app-terminal|                                                                             |
 +---------------------------------------------------------------------------------------------------------------+
-| 2. Navigate to the generated application directory and start the Flask application:                          |
+| 2. Navigate to the generated application directory (if needed) and start the Flask application:               |
 |                                                                                                               |
 | .. code-block:: bash                                                                                          |
 |                                                                                                               |
-|    cd demo-app                                                                                                |
 |    flask run --host=0.0.0.0 --port=5000                                                                       |
 |                                                                                                               |
 | |module1-cline-demo-app-act-3-flask-command|                                                                   |
@@ -165,7 +239,14 @@ associated with Vibe Coding.
 |                                                                                                               |
 | |module1-cline-demo-app-terminal-4-flask-running|                                                              |
 +---------------------------------------------------------------------------------------------------------------+
-| 4. Open Firefox in your lab environment and navigate to the application URL to test functionality.            |
+| 4. Access the application using one of the following options:                                                 |
+|                                                                                                               |
+|    **Option 1:** Access via VSCode popup. After running the flask command, you should see a popup             |
+|    from VSCode. Click **Open** and the app will open in your browser.                                         |
+|                                                                                                               |
+| |module1-cline-demo-app-terminal-4-vscode-access|                                                              |
+|                                                                                                               |
+|    **Option 2:** Access the app using the Firefox container running on the Jumphost.                          |
 |                                                                                                               |
 | |module1-cline-demo-app-terminal-4-firefox|                                                                    |
 |                                                                                                               |
@@ -276,6 +357,8 @@ associated with Vibe Coding.
    :width: 800px
 .. |module1-cline-demo-app-act| image:: ../_static/module1-cline-demo-app-act.png
    :width: 800px
+.. |module1-cline-demo-app-act-2| image:: ../_static/module1-cline-demo-app-act-2.png
+   :width: 800px
 .. |module1-cline-demo-app-act-3-task-completed| image:: ../_static/module1-cline-demo-app-act-3-task-completed.png
    :width: 800px
 .. |module1-cline-demo-app-terminal| image:: ../_static/module1-cline-demo-app-terminal.png
@@ -283,6 +366,8 @@ associated with Vibe Coding.
 .. |module1-cline-demo-app-act-3-flask-command| image:: ../_static/module1-cline-demo-app-act-3-flask-command.png
    :width: 800px
 .. |module1-cline-demo-app-terminal-4-flask-running| image:: ../_static/module1-cline-demo-app-terminal-4-flask-running.png
+   :width: 800px
+.. |module1-cline-demo-app-terminal-4-vscode-access| image:: ../_static/module1-cline-demo-app-terminal-4-vscode-access.png
    :width: 800px
 .. |module1-cline-demo-app-terminal-4-firefox| image:: ../_static/module1-cline-demo-app-terminal-4-firefox.png
    :width: 800px
@@ -302,4 +387,3 @@ associated with Vibe Coding.
    :width: 800px
 .. |labend| image:: ../_static/labend.png
    :width: 800px
-
