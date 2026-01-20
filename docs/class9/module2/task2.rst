@@ -1,9 +1,9 @@
 Module 2: Deploy and Secure F5 AI-Generated App
 ===============================================
 
-This module guides you through deploying a pre-vetted vulnerable application using GitLab CI/CD
-pipelines and securing it with F5 Distributed Cloud (F5XC) services. You will experience Policy-as-Code
-enforcement, observe pipeline failures, and validate security controls through attack testing.
+In this module, you will transition from "vibe coding" to a structured DevSecOps workflow.
+You'll work with a pre-created F5 AI-generated application, implement security-as-code using
+GitLab CI/CD, and deploy runtime protection on F5 Distributed Cloud.
 
 .. note::
    **Pre-Vetted Application**
@@ -43,7 +43,11 @@ CI/CD pipeline.
 |                                                                                                               |
 | |module2-open-module2-workspace-2|                                                                            |
 +---------------------------------------------------------------------------------------------------------------+
-| 3. Review the F5 AI-generated application structure. The application contains intentional vulnerabilities     |
+| 3. Close any open code assistant popups.                                                                      |
+|                                                                                                               |
+| |module2-close-vscode-agent-more|                                                                             |
++---------------------------------------------------------------------------------------------------------------+
+| 4. Review the F5 AI-generated application structure. The application contains intentional vulnerabilities     |
 |                                                                                                               |
 |    that will be protected by F5XC security controls after deployment.                                         |
 |                                                                                                               |
@@ -77,7 +81,7 @@ CI/CD pipeline.
 |                                                                                                               |
 |    * **policy_gate** - Evaluates ``security-controls.yaml`` (enforces WAF minimum requirement)                |
 |    * **test** - Simple SAST test using pytest                                                                 |
-|    * **build** - Docker build and push to Google Artifacts                                                    |
+|    * **build** - Docker build and push to Google Artifact Registry                                            |
 |    * **deploy** - Deploy F5XC security controls via Terraform                                                 |
 |                                                                                                               |
 | |module2-gitlab-student-project-2|                                                                            |
@@ -109,17 +113,23 @@ CI/CD pipeline.
 |                                                                                                               |
 | .. code-block:: yaml                                                                                          |
 |                                                                                                               |
-|    # security-controls.yaml                                                                                   |
-|    # Policy-as-Code configuration for F5XC security controls                                                  |
-|    security:                                                                                                  |
-|      waf: disable           # WAF protection status - INTENTIONALLY DISABLED                                  |
-|      bot_defense: enable    # Bot defense status                                                              |
-|      api_protection: enable # API protection status                                                           |
+|    # F5 AppWorld 2026 - Security Controls                                                                     |
+|    # Policy-as-Code definition for F5XC WAAP                                                                  |
+|                                                                                                               |
+|    controls:                                                                                                  |
+|      waf:                                                                                                     |
+|        enabled: false                                                                                         |
+|      api_discovery:                                                                                           |
+|        enabled: false                                                                                         |
+|      bot_advanced:                                                                                            |
+|        enabled: false                                                                                         |
+|      rate_limiting:                                                                                           |
+|        enabled: false                                                                                         |
 |                                                                                                               |
 | |module2-vscode-cretate-security-control-3|                                                                   |
 |                                                                                                               |
 | .. note::                                                                                                     |
-|    *The WAF setting is deliberately set to* ``disable`` *to demonstrate Policy-as-Code enforcement.*          |
+|    *The WAF setting is deliberately set to* ``false`` *to demonstrate Policy-as-Code enforcement.*            |
 |    *The pipeline will fail at the* ``policy_gate`` *stage, showing how security requirements are*             |
 |    *enforced before deployment.*                                                                              |
 +---------------------------------------------------------------------------------------------------------------+
@@ -161,7 +171,7 @@ CI/CD pipeline.
 +---------------------------------------------------------------------------------------------------------------+
 | 2. Observe the pipeline executing. The pipeline will **fail** at the **policy_gate** stage because            |
 |                                                                                                               |
-|    WAF is set to ``disable`` in ``security-controls.yaml``.                                                   |
+|    WAF is set to ``false`` in ``security-controls.yaml``.                                                     |
 |                                                                                                               |
 | .. note::                                                                                                     |
 |    *This demonstrates the "Secure" part of the DevSecOps loop. Policy-as-Code prevents insecure*              |
@@ -175,16 +185,13 @@ CI/CD pipeline.
 +===============================================================================================================+
 | 1. Return to VSCode Server and open ``security-controls.yaml``.                                               |
 +---------------------------------------------------------------------------------------------------------------+
-| 2. Change the WAF setting from ``disable`` to ``enable``:                                                     |
+| 2. Change the WAF setting from ``false`` to ``true``:                                                         |
 |                                                                                                               |
 | .. code-block:: yaml                                                                                          |
 |                                                                                                               |
-|    # security-controls.yaml                                                                                   |
-|    # Policy-as-Code configuration for F5XC security controls                                                  |
-|    security:                                                                                                  |
-|      waf: enable            # Changed from 'disable' to 'enable'                                              |
-|      bot_defense: enable                                                                                      |
-|      api_protection: enable                                                                                   |
+|    controls:                                                                                                  |
+|      waf:                                                                                                     |
+|        enabled: true        # Changed from 'false' to 'true'                                                  |
 +---------------------------------------------------------------------------------------------------------------+
 | 3. Save the file, then commit and push the change:                                                            |
 |                                                                                                               |
@@ -196,7 +203,7 @@ CI/CD pipeline.
 |                                                                                                               |
 |    * **policy_gate** - Passes (WAF is now enabled)                                                            |
 |    * **test** - SAST tests pass                                                                               |
-|    * **build** - Docker image v1.0 built and pushed to Google Artifacts                                       |
+|    * **build** - Docker image v1.0 built and pushed to Google Artifact Registry                               |
 |    * **deploy** - Terraform creates F5XC resources                                                            |
 +---------------------------------------------------------------------------------------------------------------+
 
@@ -245,23 +252,25 @@ CI/CD pipeline.
 
 ----
 
-Task 2: Attack the Deployed Application
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Task 2: Attack and Review Security Events
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In this task, you will launch simple attacks against the deployed F5 AI-generated application to
 verify that F5XC WAF is actively protecting it. You will then review security events in the F5XC
 Console.
 
 +---------------------------------------------------------------------------------------------------------------+
-| **Browser-Based Attack Testing**                                                                              |
+| **Launch Attacks Against the Application**                                                                    |
 +===============================================================================================================+
 | 1. Open your application URL in a browser:                                                                    |
 |                                                                                                               |
 |    ``https://<NAMESPACE>-lb.lab-app.f5demos.com``                                                              |
 +---------------------------------------------------------------------------------------------------------------+
-| 2. Test a **SQL Injection** attack by appending an attack payload to the URL:                                 |
+| 2. Simulate simple attacks against the F5 AI-generated app. Try adding scripts or common injection            |
 |                                                                                                               |
-|    ``https://<NAMESPACE>-lb.lab-app.f5demos.com/<script>alert('XSS')</script>``                                |
+|    patterns to the URL:                                                                                       |
+|                                                                                                               |
+|    ``https://<NAMESPACE>-lb.lab-app.f5demos.com/<script>alert(1)</script>``                                    |
 |                                                                                                               |
 | .. note::                                                                                                     |
 |    *Your instructor may provide alternative attack paths based on the application endpoints.*                 |
@@ -338,6 +347,8 @@ Console.
 .. |module2-open-module2-workspace-1| image:: ../_static/module2-open-module2-workspace-1.png
    :width: 800px
 .. |module2-open-module2-workspace-2| image:: ../_static/module2-open-module2-workspace-2.png
+   :width: 800px
+.. |module2-close-vscode-agent-more| image:: ../_static/close-vscode-agent-more.png
    :width: 800px
 .. |module2-app-1| image:: ../_static/module2-app-1.png
    :width: 800px
