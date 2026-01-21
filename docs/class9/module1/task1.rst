@@ -93,7 +93,19 @@ associated with Vibe Coding.
 |    *the AI intends to do, while Act mode executes those intentions. Security-conscious developers should*     |
 |    *always review the Plan before allowing the AI to Act.*                                                    |
 +---------------------------------------------------------------------------------------------------------------+
-| 2. Click **Start New Task** in the Cline panel to begin a new AI interaction.                                 |
+| 2. Notice the **Plan** and **Act** toggle in the bottom-right corner of the Cline panel. When **Plan** is     |
+|                                                                                                               |
+|    selected (highlighted), the AI will only propose a plan without making changes.                            |
+|                                                                                                               |
+| |client-demo-app-plan|                                                                                        |
++---------------------------------------------------------------------------------------------------------------+
+| 3. After submitting a prompt in **Plan** mode, the AI will respond with its proposed plan and ask if you      |
+|                                                                                                               |
+|    want to proceed to **Act Mode** to execute the changes.                                                    |
+|                                                                                                               |
+| |client-demo-app-plan-response|                                                                               |
++---------------------------------------------------------------------------------------------------------------+
+| 4. Click **Start New Task** in the Cline panel to begin a new AI interaction.                                 |
 |                                                                                                               |
 | |module1-cline_prompt_input|                                                                                  |
 +---------------------------------------------------------------------------------------------------------------+
@@ -348,6 +360,10 @@ associated with Vibe Coding.
 .. |module1-cline_capabilities| image:: ../_static/module1-cline_capabilities.png
    :width: 800px
 .. |module1-cline-start-new-task| image:: ../_static/module1-cline-start-new-task.png
+   :width: 800px
+.. |client-demo-app-plan| image:: ../_static/client-demo-app-plan.png
+   :width: 800px
+.. |client-demo-app-plan-response| image:: ../_static/client-demo-app-plan-response.png
    :width: 800px
 .. |module1-cline_prompt_input| image:: ../_static/module1-cline_prompt_input.png
    :width: 800px
